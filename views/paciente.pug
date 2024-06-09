@@ -1,0 +1,16 @@
+doctype html
+html
+  head
+    title Detalles del Paciente
+  body
+    h1 Detalles del Paciente
+    p
+      strong Nombre:
+      |  #{paciente.nombre}
+    p
+      strong Apellido:
+      |  #{paciente.apellido}
+    p
+      strong DNI:
+      |  #{paciente.dni}
+    a(href='/pacientes') Volver a la lista de pacientes

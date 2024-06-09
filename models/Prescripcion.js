@@ -1,22 +1,36 @@
-const pool = require('../config/database');
+const pool = require('../config/config');
 
-async function create({ id_profesional_salud, id_paciente, diagnostico }) {
-    const [result] = await pool.query('INSERT INTO Prescripcion (id_profesional_salud, id_paciente, diagnostico, fecha_prescripcion) VALUES (?, ?, ?, NOW())', [id_profesional_salud, id_paciente, diagnostico]);
-    return { id: result.insertId };
+class Prescripcion {
+    constructor(id_prescripcion, id_profesional_salud, id_paciente, diagnostico, fecha_prescripcion, vigencia) {
+        this.id_prescripcion = id_prescripcion;
+        this.id_profesional_salud = id_profesional_salud;
+        this.id_paciente = id_paciente;
+        this.diagnostico = diagnostico;
+        this.fecha_prescripcion = fecha_prescripcion;
+        this.vigencia = vigencia;
+    }
+
+    static getAll(callback) {
+        pool.query('SELECT * FROM prescripcion', (err, results) => {
+            if (err) {
+                return callback(err, null);
+            }
+            callback(null, results);
+        });
+    }
+
+    static getById(id, callback) {
+        pool.query('SELECT * FROM prescripcion WHERE id_prescripcion = ?', [id], (err, results) => {
+            if (err) {
+                return callback(err, null);
+            }
+            if (results.length) {
+                callback(null, new Prescripcion(...results[0]));
+            } else {
+                callback({ message: 'Prescripcion no encontrada' }, null);
+            }
+        });
+    }
 }
 
-async function addMedicamento(id_prescripcion, medicamento) {
-    const { presentacion_id, dosis, duracion, intervalo_administracion } = medicamento;
-    await pool.query('INSERT INTO Prescripcion_Medicamento (id_prescripcion, presentacion_id, dosis, duracion, intervalo_administracion) VALUES (?, ?, ?, ?, ?)', [id_prescripcion, presentacion_id, dosis, duracion, intervalo_administracion]);
-}
 
-async function addPrestacion(id_prescripcion, prestacion) {
-    const { id_prestacion, observacion, resultado } = prestacion;
-    await pool.query('INSERT INTO Prescripcion_Prestacion (id_prescripcion, id_prestacion, observacion, resultado) VALUES (?, ?, ?, ?)', [id_prescripcion, id_prestacion, observacion, resultado]);
-}
-
-module.exports = {
-    create,
-    addMedicamento,
-    addPrestacion
-};

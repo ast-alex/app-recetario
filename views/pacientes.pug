@@ -1,0 +1,32 @@
+doctype html
+html
+  head
+    title Lista de Pacientes
+  body
+    h1 Lista de Pacientes
+    a(href='/pacientes/new') Nuevo Paciente
+    table
+      thead
+        tr
+          th Nombre
+          th Apellido
+          th DNI
+          th Fecha de Nacimiento
+          th Sexo
+          th Acciones
+      tbody
+        each paciente in pacientes
+          tr
+            td #{paciente.nombre}
+            td #{paciente.apellido}
+            td #{paciente.dni}
+            td #{paciente.fecha_nacimiento}
+            td #{paciente.sexo}
+            td
+              a(href=`/pacientes/${paciente.id_paciente}`) Ver
+              |  |
+              a(href=`/pacientes/edit/${paciente.id_paciente}`) Editar
+              |  |
+              form(action=`/pacientes/${paciente.id_paciente}?_method=DELETE`, method='POST')
+                button(type='submit') Eliminar
+    br

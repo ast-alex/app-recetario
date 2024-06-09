@@ -1,69 +1,71 @@
 const pool = require('../config/config');
 
-const buscarPaciente = async (term) => {
-    try {
-        const query = `
-            SELECT * FROM paciente 
-            WHERE nombre LIKE ? OR apellido LIKE ? OR dni LIKE ?
-        `;
-        const [rows] = await pool.execute(query, [`%${term}%`, `%${term}%`, `%${term}%`]);
-        if (rows.length === 0) {
-            throw new Error('No se encontraron resultados');
-        }
-        return rows;
-    } catch (error) {
-        console.error('Error en el modelo al buscar pacientes:', error.message);
-        throw error;
+class Paciente {
+    constructor(id_paciente, id_plan, nombre, apellido, dni, fecha_nacimiento, sexo) {
+        this.id_paciente = id_paciente;
+        this.id_plan = id_plan;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.dni = dni;
+        this.fecha_nacimiento = fecha_nacimiento;
+        this.sexo = sexo;
     }
-};
-
-
-module.exports = {
-    buscarPaciente,
     
-    crearPaciente: async (paciente) =>{
-        try {
-            const {id_plan, nombre, apellido, dni, fecha_nacimiento, sexo} = paciente;
-            const [result] = await pool.execute('INSERT INTO paciente (id_plan, nombre, apellido, dni, fecha_nacimiento, sexo) VALUES (?, ?, ?, ?, ?, ?)', 
-                [id_plan, nombre, apellido, dni, fecha_nacimiento, sexo]
-            );
-            return result.insertId;
-        } catch (error) {
-            console.error('error al crear paciente', error)
-            throw error;
-        }
-    },
-    actualizarPaciente: async (id, paciente) =>{
-        try {
-            const {id_plan, nombre, apellido, dni, fecha_nacimiento, sexo} = paciente;
-            await pool.execute(
-                'UPDATE paciente SET id_plan = ?, nombre = ?, apellido = ?, dni = ?, fecha_nacimiento = ?, sexo = ? WHERE id = ?', 
-                [id_plan, nombre, apellido, dni, fecha_nacimiento, sexo, id]
-            );
-        } catch (error) {
-            console.error('error al actualizar paciente', error)
-            throw error;
-        }
-    },
-    eliminarPaciente: async (id) =>{
-        try {
-            await pool.execute(
-                'DELETE FROM paciente WHERE id = ?', 
-                [id]);
-        } catch (error) {
-            console.error('error al eliminar paciente', error)
-            throw error;
-        }
-    },
-    obtenerPacientePorId: async (id) =>{
-        try {
-            const [rows] = await pool.execute(
-                'SELECT * FROM paciente WHERE id = ?', 
-                [id]);
-            return rows[0];
-        } catch (error) {
-            console.error('error al obtener paciente', error)
-            throw error;
-        }
+    static getAll(callback) {
+        pool.query('SELECT * FROM paciente', (error, results) => {
+            if(error) {
+                return callback(error, null);
+            }
+            const pacientes = results.map(row => new Paciente(row.id_paciente, row.id_plan, row.nombre, row.apellido, row.dni, row.fecha_nacimiento, row.sexo));
+            callback(null, pacientes);
+        });
+    }
+
+    static getById(id, callback) {
+        pool.query('SELECT * FROM paciente WHERE id_paciente = ?', [id], (err, results) => {
+            if (err) {
+                return callback(err, null);
+            }
+            if (results.length) {
+                callback(null, new Paciente(...results[0]));
+            } else {
+                callback({ message: 'Paciente no encontrado' }, null);
+            }
+        });
+    }
+
+    static create(data, callback){
+        const { id_plan, nombre, apellido, dni, fecha_nacimiento, sexo } = data;
+        pool.query('INSERT INTO paciente(id_plan, nombre, apellido, dni, fecha_nacimiento, sexo) VALUES(?,?,?,?,?,?)', 
+            [id_plan, nombre, apellido, dni, fecha_nacimiento, sexo], 
+            (error, results) => {
+            if(error) {
+                return callback(error);
+            }
+            callback(null, results);
+        });
+    }
+
+    static update(id, data, callback) {
+        const { id_plan, nombre, apellido, dni, fecha_nacimiento, sexo } = data;
+        pool.query('UPDATE paciente SET id_plan = ?, nombre = ?, apellido = ?, dni = ?, fecha_nacimiento = ?, sexo = ? WHERE id_paciente = ?', 
+            [id_plan, nombre, apellido, dni, fecha_nacimiento, sexo, id], 
+            (error, results) => {
+            if(error) {
+                return callback(error);
+            }
+            callback(null, results);
+        });
+    }
+
+    static delete(id, callback) {
+        pool.query('DELETE FROM paciente WHERE id_paciente = ?', [id], (error, results) => {
+            if(error) {
+                return callback(error);
+            }
+            callback(null, results);
+        });
     }
 }
+
+module.exports = Paciente;

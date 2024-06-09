@@ -1,0 +1,27 @@
+doctype html
+html
+    head
+        title= title
+    body
+        h1= title
+        form(action=action, method="POST")
+            if method === 'PUT'
+                input(type="hidden", name="_method", value="PUT")
+            label(for="nombre") Nombre:
+            input(type="text", name="nombre", value=paciente ? paciente.nombre : '')
+            br
+            label(for="apellido") Apellido:
+            input(type="text", name="apellido", value=paciente ? paciente.apellido : '')
+            br
+            label(for="dni") DNI:
+            input(type="text", name="dni", value=paciente ? paciente.dni : '')
+            br
+            label(for="fecha_nacimiento") Fecha de Nacimiento:
+            input(type="date", name="fecha_nacimiento", value=paciente ? paciente.fecha_nacimiento.toISOString().substring(0, 10) : '')
+            br
+            label(for="sexo") Sexo:
+            select(name="sexo")
+                option(value="M" selected=paciente && paciente.sexo === 'M') Masculino
+                option(value="F" selected=paciente && paciente.sexo === 'F') Femenino
+            br
+            button(type="submit") Guardar

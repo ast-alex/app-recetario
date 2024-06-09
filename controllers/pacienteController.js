@@ -1,62 +1,76 @@
-const pool = require('../config/config');
-const paciente = require('../models/Paciente');
+const Paciente = require('../models/Paciente');
 
-const buscarPaciente = async (req, res) => {
-    try {
-        const { term } = req.query;
-        if (!term) {
-            return res.status(400).send('El término de búsqueda es requerido');
+exports.getPacientes = (req, res) =>{
+    Paciente.getAll((error, results) =>{
+        if(error){
+            res.status(500).send(error);
         }
-        const pacientes = await paciente.buscarPaciente(term);
-        res.render('paciente/buscar', { pacientes });
-    } catch (error) {
-        console.error('Error en el controlador al buscar pacientes:', error.message);
-        res.status(500).send('Error al buscar paciente');
-    }
+        else{
+            res.render('pacientes', {pacientes: results});
+        }
+    });
 };
 
-module.exports = {
-    buscarPaciente,
-    crearPaciente: async (req, res) => {
-        try {
-            const paciente = req.body;
-            const id = await paciente.crearPaciente(paciente);
-            res.status(201).json({ id });
-        } catch (error) {
-            console.error(error, 'al crear paciente');
-            res.status(500).send('Error al crear paciente');
+exports.getPacienteById = (req, res) =>{
+    const id = req.params.id;
+    Paciente.getById(id, (error, paciente) =>{
+        if(error){
+            res.status(500).send(error);
         }
-    },
+        else if(paciente){
+            res.render('paciente', { paciente })
+        }
+        else{
+            res.status(404).send('Paciente no encontrado');
+        }
+    });
+};
 
-    actualizarPaciente : async (req, res) => {
-        try {
-            const { id } = req.params;
-            const paciente = req.body;
-            await paciente.actualizarPaciente(id, paciente);
-            res.status(200).send('Paciente actualizado');
-        } catch (error) {
-            console.error(error, 'al actualizar paciente');
-            res.status(500).send('Error al actualizar paciente');
+exports.createPaciente = (req, res) =>{
+    Paciente.create(req.body, (error, paciente) =>{
+        if(error){
+            res.status(500).send(error);
         }
-    },
-    eliminarPaciente: async (req, res) => {
-        try {
-            const { id } = req.params;
-            await paciente.eliminarPaciente(id);
-            res.status(200).send('Paciente eliminado');
-        } catch (error) {
-            console.error(error, 'al eliminar paciente');
-            res.status(500).send('Error al eliminar paciente');
+        else{
+            res.redirect('pacientes')
         }
-    },
-    obtenerPacientePorId: async (req, res) => {
-        try {
-            const { id } = req.params;
-            const paciente = await obtenerPacientePorId(id);
-            res.status(200).json(paciente);
-        } catch (error) {
-            console.error(error, 'al obtener paciente');
-            res.status(500).send('Error al obtener paciente');
+    });
+};
+
+exports.editPaciente = (req, res) =>{
+    const id = req.params.id;
+    Paciente.getById(id, (error, paciente) =>{
+        if(error){
+            res.status(500).send(error);
         }
-    }
+        else if(paciente){
+            res.render('form-paciente', { title: 'Editar', action: '/pacientes/${id}?_method=PUT' + id, method: 'POST', paciente });
+        }
+        else{
+            res.status(404).send('Paciente no encontrado');
+        }
+    });
+}
+
+exports.updatePaciente = (req, res) =>{
+    const id = req.params.id;
+    Paciente.update(id, req.body, (error, results) =>{
+        if(error){
+            res.status(500).send(error);
+        }
+        else{
+            res.redirect('/pacientes');
+        }
+    });
+};
+
+exports.deletePaciente = (req, res) =>{
+    const id = req.params.id;
+    Paciente.delete(id, (error, results) =>{
+        if(error){
+            res.status(500).send(error)
+        }else{
+            res.redirect('/pacientes');
+        }
+    });
 }

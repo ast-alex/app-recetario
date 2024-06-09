@@ -1,16 +1,33 @@
 const pool = require('../config');
 
-async function findAll() {
-    const [rows] = await pool.query('SELECT * FROM prestacion');
-    return rows;
-}
+class Prestacion {
+    constructor(id_prestacion, nombre, lado, indicacion, justificacion) {
+        this.id_prestacion = id_prestacion;
+        this.nombre = nombre;
+        this.lado = lado;
+        this.indicacion = indicacion;
+        this.justificacion = justificacion;
+    }
 
-async function findById(id) {
-    const [rows] = await pool.query('SELECT * FROM prestacion WHERE id = ?', [id]);
-    return rows[0];
-}
+    static getAll(callback) {
+        pool.query('SELECT * FROM prestacion', (error, results) => {
+            if (error) {
+                throw error;
+            }
+            callback(null, results);
+        });
+    }
 
-module.exports = {
-    findAll,
-    findById
+    static getById(id, callback) {
+        pool.query('SELECT * FROM prestacion WHERE id_prestacion = ?', [id], (err, results) => {
+            if (err) {
+                return callback(err, null);
+            }
+            if (results.length) {
+                callback(null, new Prestacion(...results[0]));
+            } else {
+                callback({ message: 'Prestacion no encontrada' }, null);
+            }
+        });
+    }
 }
