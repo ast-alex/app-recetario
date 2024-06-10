@@ -4,6 +4,7 @@ const methodOverride = require("method-override");
 const path = require("path");
 const pool = require('./config/config');
 const pacienteRoutes = require('./routes/pacienteRoutes');
+const prescripcionRoutes = require('./routes/prescripcionRoutes');
 const app = express();
 
 app.set('view engine', 'pug');
@@ -15,6 +16,7 @@ app.use(methodOverride('_method'));
 
 
 app.use('/pacientes', pacienteRoutes);
+app.use('/prescripcion', prescripcionRoutes);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => { 

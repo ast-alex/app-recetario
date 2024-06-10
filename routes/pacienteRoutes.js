@@ -12,6 +12,7 @@ router.get('/:id', pacienteController.getPacienteById);
 router.get('/edit/:id', pacienteController.editPaciente);
 router.put('/:id', pacienteController.updatePaciente);
 router.delete('/:id', pacienteController.deletePaciente);
+router.get('/buscar', pacienteController.buscarPacienteDni);
 
 router.get('/prueba', (req, res)=>{
     res.send('prueba funcionamiento');

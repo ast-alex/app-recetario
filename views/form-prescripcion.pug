@@ -1,0 +1,18 @@
+doctype html
+html
+  head
+    title Crear Prescripción
+  body
+    h1 Crear Prescripción
+    form(action='/prescripciones', method='POST')
+      label(for='paciente') Paciente:
+      select(id='paciente' name='paciente')
+        each paciente in pacientes
+          option(value=`${paciente.id_paciente}`) #{paciente.nombre} #{paciente.apellido}
+      label(for='medicamentos') Medicamentos:
+      input(type='text' id='medicamentos' name='medicamentos' placeholder='Buscar medicamentos...')
+      // Aquí podrías implementar un buscador o autocompletado para medicamentos
+      label(for='prestaciones') Prestaciones:
+      input(type='text' id='prestaciones' name='prestaciones' placeholder='Buscar prestaciones...')
+      // Aquí podrías implementar un buscador o autocompletado para prestaciones
+      button(type='submit') Guardar Prescripción

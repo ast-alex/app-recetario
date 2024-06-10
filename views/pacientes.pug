@@ -5,6 +5,12 @@ html
   body
     h1 Lista de Pacientes
     a(href='/pacientes/new') Nuevo Paciente
+
+    // Campo de búsqueda por DNI
+    form(action='/pacientes', method='GET')
+      input(type='text', name='dni', placeholder='Buscar por DNI')
+      button(type='submit') Buscar
+
     table
       thead
         tr
@@ -25,8 +31,13 @@ html
             td
               a(href=`/pacientes/${paciente.id_paciente}`) Ver
               |  |
+              // Enlace para prescribir
+              a(href=`/prescribir/${paciente.id_paciente}`) Prescribir
+              |  |
+              // Enlace para editar
               a(href=`/pacientes/edit/${paciente.id_paciente}`) Editar
               |  |
+              // Formulario para eliminar
               form(action=`/pacientes/${paciente.id_paciente}?_method=DELETE`, method='POST')
                 button(type='submit') Eliminar
     br

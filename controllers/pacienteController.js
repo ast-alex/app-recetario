@@ -74,3 +74,13 @@ exports.deletePaciente = (req, res) =>{
         }
     });
 }
+exports.buscarPacienteDni = (req, res) =>{
+    const dni = req.query.dni;
+    Paciente.getByDni(dni, (error, pacientes) =>{
+        if(error){
+            res.status(500).send(error);
+        }else{
+            res.render('pacientes', {pacientes});
+        }
+    });
+}

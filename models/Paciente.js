@@ -66,6 +66,20 @@ class Paciente {
             callback(null, results);
         });
     }
+
+    static getByDni (dni, callback) {
+        pool.query('SELECT * FROM paciente WHERE dni = ?', [dni], (err, results) => {
+            if (err) {
+                return callback(err, null);
+            }
+            if (results.length) {
+                const pacientes = results.map(row => new Paciente(row.id_paciente, row.id_plan, row.nombre, row.apellido, row.dni, row.fecha_nacimiento, row.sexo));
+                callback(null, pacientes);
+            } else {
+                callback({ message: 'No se econtraron pacientes con ese DNI' }, null);
+            }
+        });
+    }
 }
 
 module.exports = Paciente;
