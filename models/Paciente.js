@@ -27,7 +27,7 @@ class Paciente {
                 return callback(err, null);
             }
             if (results.length) {
-                callback(null, new Paciente(...results[0]));
+                callback(null, new Paciente(results[0].id_paciente, results[0].id_plan, results[0].nombre, results[0].apellido, results[0].dni, results[0].fecha_nacimiento, results[0].sexo));
             } else {
                 callback({ message: 'Paciente no encontrado' }, null);
             }
@@ -36,7 +36,7 @@ class Paciente {
 
     static create(data, callback){
         const { id_plan, nombre, apellido, dni, fecha_nacimiento, sexo } = data;
-        pool.query('INSERT INTO paciente(id_plan, nombre, apellido, dni, fecha_nacimiento, sexo) VALUES(?,?,?,?,?,?)', 
+        pool.query('INSERT INTO paciente (id_plan, nombre, apellido, dni, fecha_nacimiento, sexo) VALUES(?,?,?,?,?,?)', 
             [id_plan, nombre, apellido, dni, fecha_nacimiento, sexo], 
             (error, results) => {
             if(error) {

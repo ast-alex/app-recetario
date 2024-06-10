@@ -7,6 +7,9 @@ html
         form(action=action, method="POST")
             if method === 'PUT'
                 input(type="hidden", name="_method", value="PUT")
+            label(for="id_plan") Plan: 
+            input(type="text", name="id_plan", value=paciente ? paciente.id_plan : '')
+            br
             label(for="nombre") Nombre:
             input(type="text", name="nombre", value=paciente ? paciente.nombre : '')
             br

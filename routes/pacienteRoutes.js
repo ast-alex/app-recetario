@@ -10,14 +10,8 @@ router.get('/new', (req, res) => {
 router.post('/', pacienteController.createPaciente);
 router.get('/:id', pacienteController.getPacienteById);
 router.get('/edit/:id', pacienteController.editPaciente);
-router.post('/:id', (req, res) => {
-    req.method = 'PUT';
-    next();
-}, pacienteController.updatePaciente);
-router.post('/:id/delete', (req, res) => {
-    req.method = 'DELETE';
-    next();
-}, pacienteController.deletePaciente);
+router.put('/:id', pacienteController.updatePaciente);
+router.delete('/:id', pacienteController.deletePaciente);
 
 router.get('/prueba', (req, res)=>{
     res.send('prueba funcionamiento');

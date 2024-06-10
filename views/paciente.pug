@@ -1,16 +1,16 @@
 doctype html
 html
   head
-    title Detalles del Paciente
+    title Detalle de Paciente
   body
-    h1 Detalles del Paciente
-    p
-      strong Nombre:
-      |  #{paciente.nombre}
-    p
-      strong Apellido:
-      |  #{paciente.apellido}
-    p
-      strong DNI:
-      |  #{paciente.dni}
-    a(href='/pacientes') Volver a la lista de pacientes
+    h1 Detalle de Paciente
+    p Nombre: #{paciente.nombre}
+    p Apellido: #{paciente.apellido}
+    p DNI: #{paciente.dni}
+    p Fecha de Nacimiento: #{paciente.fecha_nacimiento}
+    p Sexo: #{paciente.sexo}
+    a(href=`/pacientes/edit/${paciente.id_paciente}`) Editar
+    form(action=`/pacientes/${paciente.id_paciente}?_method=DELETE`, method='POST')
+      button(type='submit') Eliminar
+    br
+    a(href='/pacientes') Volver a la lista
