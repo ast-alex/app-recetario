@@ -16,7 +16,7 @@ app.use(methodOverride('_method'));
 
 
 app.use('/pacientes', pacienteRoutes);
-app.use('/prescripcion', prescripcionRoutes);
+app.use('/prescripciones', prescripcionRoutes);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => { 

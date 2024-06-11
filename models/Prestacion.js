@@ -1,4 +1,4 @@
-const pool = require('../config');
+const pool = require('../config/config');
 
 class Prestacion {
     constructor(id_prestacion, nombre, lado, indicacion, justificacion) {
@@ -14,6 +14,7 @@ class Prestacion {
             if (error) {
                 throw error;
             }
+            const prestaciones = results.map(row => new Prestacion(row.id_prestacion, row.nombre, row.lado, row.indicacion, row.justificacion));
             callback(null, results);
         });
     }
@@ -31,3 +32,5 @@ class Prestacion {
         });
     }
 }
+
+module.exports = Prestacion;

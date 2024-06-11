@@ -1,18 +1,120 @@
 doctype html
 html
   head
-    title Crear Prescripción
+    title Prescripción para #{paciente.nombre} #{paciente.apellido}
   body
-    h1 Crear Prescripción
-    form(action='/prescripciones', method='POST')
-      label(for='paciente') Paciente:
-      select(id='paciente' name='paciente')
-        each paciente in pacientes
-          option(value=`${paciente.id_paciente}`) #{paciente.nombre} #{paciente.apellido}
-      label(for='medicamentos') Medicamentos:
-      input(type='text' id='medicamentos' name='medicamentos' placeholder='Buscar medicamentos...')
-      // Aquí podrías implementar un buscador o autocompletado para medicamentos
-      label(for='prestaciones') Prestaciones:
-      input(type='text' id='prestaciones' name='prestaciones' placeholder='Buscar prestaciones...')
-      // Aquí podrías implementar un buscador o autocompletado para prestaciones
+    h1 Prescripción para #{paciente.nombre} #{paciente.apellido}
+
+    form(action='/prescripciones' method='POST')
+      input(type='hidden' name='id_paciente' value=paciente.id_paciente)
+      
+      // Datos de la prescripción
+      div
+        label(for='id_profesional_salud') Profesional de Salud:
+        input(type='text' name='id_profesional_salud' required)
+
+      div
+        label(for='diagnostico') Diagnóstico:
+        textarea(name='diagnostico' required)
+
+      div
+        label(for='fecha_prescripcion') Fecha de Prescripción:
+        input(type='date' name='fecha_prescripcion' required)
+
+      div
+        label(for='vigencia') Vigencia:
+        input(type='date' name='vigencia' required)
+
+      // Medicamentos
+      h2 Medicamentos
+      div#medicamentos
+        each medicamento in medicamentos
+          div.medicamento
+            select(name='medicamentos[id_presentacion][]' required)
+              option(value='') Seleccione una presentación
+              each presentacion in presentaciones
+                if presentacion.id_medicamento == medicamento.id_medicamento
+                  option(value=presentacion.id_presentacion) #{presentacion.nombre_comercial}
+
+            input(type='text' name='medicamentos[dosis][]' placeholder='Dosis' required)
+            input(type='text' name='medicamentos[duracion][]' placeholder='Duración' required)
+            input(type='text' name='medicamentos[intervalo_administracion][]' placeholder='Intervalo de Administración' required)
+            button(type='button' onclick='removeMedicamento(this)') Eliminar
+
+      button(type='button' onclick='addMedicamento()') Añadir Medicamento
+
+      // Prestaciones
+      h2 Prestaciones
+      div#prestaciones
+        each prestacion in prestaciones
+          div.prestacion
+            select(name='prestaciones[id_prestacion][]' required)
+              option(value='') Seleccione una prestación
+              option(value=prestacion.id_prestacion) #{prestacion.nombre}
+              
+            input(type='text' name='prestaciones[observacion][]' placeholder='Observación' required)
+            input(type='text' name='prestaciones[resultado][]' placeholder='Resultado' required)
+            button(type='button' onclick='removePrestacion(this)') Eliminar
+
+      button(type='button' onclick='addPrestacion()') Añadir Prestación
+
+      // Botón de guardar
       button(type='submit') Guardar Prescripción
+
+    // Pasar datos del servidor al cliente
+    script.
+      var medicamentos = !{JSON.stringify(medicamentos)};
+      var presentaciones = !{JSON.stringify(presentaciones)};
+      var prestaciones = !{JSON.stringify(prestaciones)};
+
+    script.
+      function addMedicamento() {
+        var container = document.getElementById('medicamentos');
+        var div = document.createElement('div');
+        div.className = 'medicamento';
+        div.innerHTML = `
+          <select name="medicamentos[id_presentacion][]" required>
+            <option value="">Seleccione una presentación</option>
+            ${medicamentos.map(medicamento => `
+              ${presentaciones.map(presentacion => `
+                ${presentacion.id_medicamento == medicamento.id_medicamento ? `
+                  <option value="${presentacion.id_presentacion}">${presentacion.nombre_comercial}</option>
+                ` : ''}
+              `).join('')}
+            `).join('')}
+          </select>
+          <input type="text" name="medicamentos[dosis][]" placeholder="Dosis" required>
+          <input type="text" name="medicamentos[duracion][]" placeholder="Duración" required>
+          <input type="text" name="medicamentos[intervalo_administracion][]" placeholder="Intervalo de Administración" required>
+          <button type="button" onclick="removeMedicamento(this)">Eliminar</button>
+        `;
+        container.appendChild(div);
+      }
+
+      function addPrestacion() {
+        var container = document.getElementById('prestaciones');
+        var div = document.createElement('div');
+        div.className = 'prestacion';
+        div.innerHTML = `
+          <select name="prestaciones[id_prestacion][]" required>
+            <option value="">Seleccione una prestación</option>
+            ${prestaciones.map(prestacion => `
+              <option value="${prestacion.id_prestacion}">${prestacion.nombre}</option>
+            `).join('')}
+          </select>
+          <input type="text" name="prestaciones[observacion][]" placeholder="Observación" required>
+          <input type="text" name="prestaciones[resultado][]" placeholder="Resultado" required>
+          <button type="button" onclick="removePrestacion(this)">Eliminar</button>
+        `;
+        container.appendChild(div);
+      }
+
+      function removeMedicamento(button) {
+        var div = button.parentNode;
+        div.parentNode.removeChild(div);
+      }
+
+      function removePrestacion(button) {
+        var div = button.parentNode;
+        div.parentNode.removeChild(div);
+      }

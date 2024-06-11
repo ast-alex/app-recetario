@@ -1,4 +1,4 @@
-const pool = require('../config');
+const pool = require('../config/config');
 
 class Medicamento {
     constructor(id_medicamento, nombre_generico, estado, id_categoria, id_familia){
@@ -14,6 +14,7 @@ class Medicamento {
             if (err) {
                 return callback(err, null);
             }
+            const medicamentos = results.map(row => new Medicamento(row.id_medicamento, row.nombre_generico, row.estado, row.id_categoria, row.id_familia));
             callback(null, results);
         });
     }
@@ -31,3 +32,5 @@ class Medicamento {
         });
     }
 }
+
+module.exports = Medicamento
