@@ -19,6 +19,30 @@ class Presentacion {
             callback(null, results);
         })
     }
+    static getAllPresentaciones(callback) {
+        const query = `
+            SELECT 
+                pr.id_presentacion,
+                pr.nombre_comercial,
+                pr.cantidad_unidades,
+                me.nombre_generico,
+                co.valor AS concentracion,
+                ff.nombre AS forma_farmaceutica
+            FROM presentacion pr
+            JOIN medicamento me ON pr.id_medicamento = me.id_medicamento
+            JOIN concentracion co ON pr.id_concentracion = co.id_concentracion
+            JOIN forma_farmaceutica ff ON pr.id_forma_farmaceutica = ff.id_forma_farmaceutica
+            WHERE me.estado = 'activo';
+        `;
+    
+        pool.query(query, (err, results) => {
+            if (err) {
+                return callback(err);
+            }
+            callback(null, results);
+        });
+    }
+    
 
     static getByMedicamentoId(id_medicamento, callback) {
         pool.query('SELECT * FROM presentacion WHERE id_medicamento = ?', [id_medicamento], (error, results) => {

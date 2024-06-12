@@ -44,7 +44,13 @@ exports.editPaciente = (req, res) =>{
             res.status(500).send(error);
         }
         else if(paciente){
-            res.render('form-paciente', { title: 'Editar Paciente', action: `/pacientes/${id}?_method=PUT`, method: 'POST', paciente });
+            res.render('form-paciente', { 
+                title: 'Editar Paciente', 
+                action: `/pacientes/${id}?_method=PUT`, 
+                method: 'POST', 
+                paciente,
+                volverLista: true
+            });
         }
         else{
             res.status(404).send('Paciente no encontrado');

@@ -13,4 +13,5 @@ html
     form(action=`/pacientes/${paciente.id_paciente}?_method=DELETE`, method='POST')
       button(type='submit') Eliminar
     br
-    a(href='/pacientes') Volver a la lista
+    a(href=`/prescripciones/new/${paciente.id_paciente}`) Prescribir
+    button.btn.btn-secondary(type='button' style='margin-top: 10px;' onclick="window.location.href='/pacientes'") Volver a la lista de pacientes

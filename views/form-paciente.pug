@@ -28,3 +28,5 @@ html
                 option(value="F" selected=paciente && paciente.sexo === 'F') Femenino
             br
             button(type="submit") Guardar
+        if volverLista 
+            button.btn.btn-secondary(type='button' style='margin-top: 10px;' onclick="window.location.href='/pacientes'") Volver a la lista de pacientes

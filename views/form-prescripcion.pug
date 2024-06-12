@@ -7,7 +7,7 @@ html
 
     form(action='/prescripciones' method='POST')
       input(type='hidden' name='id_paciente' value=paciente.id_paciente)
-      
+
       // Datos de la prescripción
       div
         label(for='id_profesional_salud') Profesional de Salud:
@@ -28,68 +28,48 @@ html
       // Medicamentos
       h2 Medicamentos
       div#medicamentos
-        each medicamento in medicamentos
-          div.medicamento
-            select(name='medicamentos[id_presentacion][]' required)
-              option(value='') Seleccione una presentación
-              each presentacion in presentaciones
-                if presentacion.id_medicamento == medicamento.id_medicamento
-                  option(value=presentacion.id_presentacion) #{presentacion.nombre_comercial}
-
-            input(type='text' name='medicamentos[dosis][]' placeholder='Dosis' required)
-            input(type='text' name='medicamentos[duracion][]' placeholder='Duración' required)
-            input(type='text' name='medicamentos[intervalo_administracion][]' placeholder='Intervalo de Administración' required)
-            button(type='button' onclick='removeMedicamento(this)') Eliminar
 
       button(type='button' onclick='addMedicamento()') Añadir Medicamento
 
       // Prestaciones
       h2 Prestaciones
       div#prestaciones
-        each prestacion in prestaciones
-          div.prestacion
-            select(name='prestaciones[id_prestacion][]' required)
-              option(value='') Seleccione una prestación
-              option(value=prestacion.id_prestacion) #{prestacion.nombre}
-              
-            input(type='text' name='prestaciones[observacion][]' placeholder='Observación' required)
-            input(type='text' name='prestaciones[resultado][]' placeholder='Resultado' required)
-            button(type='button' onclick='removePrestacion(this)') Eliminar
 
       button(type='button' onclick='addPrestacion()') Añadir Prestación
 
       // Botón de guardar
       button(type='submit') Guardar Prescripción
+      button.btn.btn-secondary(type='button' style='margin-top: 10px;' onclick="window.location.href='/pacientes'") Volver a la lista de pacientes
+
 
     // Pasar datos del servidor al cliente
     script.
-      var medicamentos = !{JSON.stringify(medicamentos)};
       var presentaciones = !{JSON.stringify(presentaciones)};
       var prestaciones = !{JSON.stringify(prestaciones)};
 
     script.
+      var presentaciones = !{JSON.stringify(presentaciones)};
+
       function addMedicamento() {
         var container = document.getElementById('medicamentos');
         var div = document.createElement('div');
         div.className = 'medicamento';
         div.innerHTML = `
-          <select name="medicamentos[id_presentacion][]" required>
-            <option value="">Seleccione una presentación</option>
-            ${medicamentos.map(medicamento => `
+            <select name="medicamentos[id_presentacion][]" required>
+              <option value="">Seleccione una presentación</option>
               ${presentaciones.map(presentacion => `
-                ${presentacion.id_medicamento == medicamento.id_medicamento ? `
-                  <option value="${presentacion.id_presentacion}">${presentacion.nombre_comercial}</option>
-                ` : ''}
+                <option value="${presentacion.id_presentacion}">
+              ${presentacion.nombre_comercial} (${presentacion.nombre_generico}, ${presentacion.concentracion}, ${presentacion.forma_farmaceutica}, ${presentacion.cantidad_unidades})
+                </option>
               `).join('')}
-            `).join('')}
-          </select>
-          <input type="text" name="medicamentos[dosis][]" placeholder="Dosis" required>
-          <input type="text" name="medicamentos[duracion][]" placeholder="Duración" required>
-          <input type="text" name="medicamentos[intervalo_administracion][]" placeholder="Intervalo de Administración" required>
-          <button type="button" onclick="removeMedicamento(this)">Eliminar</button>
-        `;
-        container.appendChild(div);
-      }
+            </select>
+            <input type="text" name="medicamentos[duracion][]" placeholder="Duración" required>
+            <input type="text" name="medicamentos[intervalo_administracion][]" placeholder="Intervalo de Administración" required>
+            <button type="button" onclick="removeMedicamento(this)">Eliminar</button>
+            `;
+            container.appendChild(div);
+        }
+
 
       function addPrestacion() {
         var container = document.getElementById('prestaciones');
@@ -118,3 +98,4 @@ html
         var div = button.parentNode;
         div.parentNode.removeChild(div);
       }
+
