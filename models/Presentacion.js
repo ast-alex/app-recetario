@@ -19,6 +19,18 @@ class Presentacion {
             callback(null, results);
         })
     }
+    static getById(id, callback) {
+        pool.query('SELECT * FROM presentacion WHERE id_presentacion = ?', [id], (err, results) => {
+            if (err) {
+                return callback(err, null);
+            }
+            if (results.length) {
+                callback(null, new Presentacion(results[0].id_presentacion, results[0].id_medicamento, results[0].id_concentracion, results[0].id_forma_farmaceutica, results[0].nombre_comercial, results[0].cantidad_unidades));
+            } else {
+                callback({ message: 'Presentación no encontrada' }, null);
+            }
+        });
+    }
     static getAllPresentaciones(callback) {
         const query = `
             SELECT 

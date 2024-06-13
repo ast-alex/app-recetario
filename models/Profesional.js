@@ -27,16 +27,19 @@ class ProfesionalSalud {
 
     static getById(id, callback) {
         pool.query('SELECT * FROM profesional_salud WHERE id_profesional_salud = ?', [id], (err, results) => {
-        if (err) {
-            return callback(err, null);
-        }
-        if (results.length) {
-            callback(null, new ProfesionalSalud(...results[0]));
-        } else {
-            callback({ message: 'Profesional de salud no encontrado' }, null);
-        }
+            if (err) {
+                return callback(err, null);
+            }
+            if (results.length) {
+                const { id_profesional_salud, id_usuario, id_rol, nombre, apellido, dni, profesion, especialidad, domicilio, matricula, id_refeeps, fecha_caducidad, fecha_registro } = results[0];
+                const profesional = new ProfesionalSalud(id_profesional_salud, id_usuario, id_rol, nombre, apellido, dni, profesion, especialidad, domicilio, matricula, id_refeeps, fecha_caducidad, fecha_registro);
+                callback(null, profesional);
+            } else {
+                callback({ message: 'Profesional de salud no encontrado' }, null);
+            }
         });
     }
+    
 }
 
 module.exports = ProfesionalSalud

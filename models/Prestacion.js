@@ -25,9 +25,9 @@ class Prestacion {
                 return callback(err, null);
             }
             if (results.length) {
-                callback(null, new Prestacion(...results[0]));
+                callback(null, new Prestacion(results[0].id_prestacion, results[0].nombre, results[0].lado, results[0].indicacion, results[0].justificacion, results[0].observacion, results[0].resultado));
             } else {
-                callback({ message: 'Prestacion no encontrada' }, null);
+                callback({ message: 'Prestación no encontrada' }, null);
             }
         });
     }

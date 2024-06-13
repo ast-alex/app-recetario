@@ -14,8 +14,4 @@ router.put('/:id', pacienteController.updatePaciente);
 router.delete('/:id', pacienteController.deletePaciente);
 router.get('/buscar', pacienteController.buscarPacienteDni);
 
-router.get('/prueba', (req, res)=>{
-    res.send('prueba funcionamiento');
-})
-
 module.exports = router;

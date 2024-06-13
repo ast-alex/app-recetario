@@ -2,7 +2,6 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const methodOverride = require("method-override");
 const path = require("path");
-const pool = require('./config/config');
 const pacienteRoutes = require('./routes/pacienteRoutes');
 const prescripcionRoutes = require('./routes/prescripcionRoutes');
 const app = express();
@@ -14,13 +13,26 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use('/pacientes', pacienteRoutes);
+app.get('/', (req, res) => {
+    res.redirect('/pacientes');
+});
 app.use('/prescripciones', prescripcionRoutes);
+
+app.use('/pdfs', express.static(path.join(__dirname, 'pdfs')));
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => { 
     console.log(`Server corriendo en el puerto ${PORT}`); 
+});
+
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Error interno del servidor');
 });
 
 

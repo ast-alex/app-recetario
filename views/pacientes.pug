@@ -2,14 +2,10 @@ doctype html
 html
   head
     title Lista de Pacientes
+    link(rel='stylesheet' href='/styles/pacientes.css')
   body
     h1 Lista de Pacientes
     a(href='/pacientes/new') Nuevo Paciente
-
-    // Campo de búsqueda por DNI
-    form(action='/pacientes', method='GET')
-      input(type='text', name='dni', placeholder='Buscar por DNI')
-      button(type='submit') Buscar
 
     table
       thead

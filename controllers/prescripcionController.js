@@ -2,9 +2,10 @@ const Paciente = require('../models/Paciente');
 const Prescripcion = require('../models/Prescripcion');
 const Profesional = require('../models/Profesional');
 const Medicamento = require('../models/Medicamento');
-const Presentacion = require('../models/Presentacion');
+const Presentacion = require('../models/Presentacion'); 
 const Prestacion = require('../models/Prestacion');
 const pdfGenerator = require('../public/pdfGenerator');
+
 
 exports.mostrarForm = (req, res) => {
     const id_paciente = req.params.id;
@@ -43,42 +44,55 @@ exports.mostrarForm = (req, res) => {
 exports.crearPrescripcion = (req, res) => {
     const { id_profesional_salud, id_paciente, diagnostico, fecha_prescripcion, vigencia } = req.body;
 
-    // Obtener los medicamentos seleccionados
-    const medicamentos = req.body.medicamentos.id_presentacion.map((id_presentacion, index) => {
-        return {
-            id_presentacion: id_presentacion,
-            concentracion: req.body.medicamentos.concentracion[index],
-            cantidad_unidades: req.body.medicamentos.cantidad_unidades[index],
-            id_forma_farmaceutica: req.body.medicamentos.id_forma_farmaceutica[index],
-            duracion: req.body.medicamentos.duracion[index],
-            intervalo_administracion: req.body.medicamentos.intervalo_administracion[index]
-        };
-    });
+    // Validar campos requeridos
+    if (!id_profesional_salud || !id_paciente || !diagnostico || !fecha_prescripcion || !vigencia) {
+        return res.status(400).json({ error: 'Todos los campos son requeridos.' });
+    }
 
-    // Obtener las prestaciones seleccionadas
-    const prestaciones = req.body.prestaciones.id_prestacion.map((id_prestacion, index) => {
-        return {
-            id_prestacion: id_prestacion,
-            observacion: req.body.prestaciones.observacion[index],
-            resultado: req.body.prestaciones.resultado[index]
-        };
-    });
+    // Verificar si medicamentos y prestaciones son arrays
+    const medicamentos = Array.isArray(req.body['medicamentos[id_presentacion][]']) ? req.body['medicamentos[id_presentacion][]'].map((id_presentacion, index) => ({
+        id_presentacion: id_presentacion,
+        concentracion: req.body['medicamentos[concentracion][]'][index],
+        cantidad_unidades: req.body['medicamentos[cantidad_unidades][]'][index],
+        id_forma_farmaceutica: req.body['medicamentos[id_forma_farmaceutica][]'][index],
+        duracion: req.body['medicamentos[duracion][]'][index],
+        intervalo_administracion: req.body['medicamentos[intervalo_administracion][]'][index]
+    })) : [];
 
-    // Crear la prescripción con los datos recopilados
-    Prescripcion.create({ id_profesional_salud, id_paciente, diagnostico, fecha_prescripcion, vigencia, medicamentos, prestaciones }, (error, prescripcion) => {
+    const prestaciones = Array.isArray(req.body['prestaciones[id_prestacion][]']) ? req.body['prestaciones[id_prestacion][]'].map((id_prestacion, index) => ({
+        id_prestacion: id_prestacion,
+        lado: req.body['prestaciones[lado][]'][index],
+        indicacion: req.body['prestaciones[indicacion][]'][index],
+        justificacion: req.body['prestaciones[justificacion][]'][index],
+        observacion: req.body['prestaciones[observacion][]'][index],
+        resultado: req.body['prestaciones[resultado][]'][index]
+    })) : [];
+
+    const prescripcionData = { 
+        id_profesional_salud, 
+        id_paciente, 
+        diagnostico, 
+        fecha_prescripcion, 
+        vigencia, 
+        medicamentos, 
+        prestaciones 
+    };
+
+    Prescripcion.create(prescripcionData, (error, prescripcion) => {
         if (error) {
-            res.status(500).send(error);
-        } else {
-            // Llamar a la función para generar el PDF
-            pdfGenerator.generarPDF(prescripcion, (err, fileName) => {
-                if (err) {
-                    res.status(500).send(err);
-                } else {
-                    // Devolver el nombre del archivo PDF generado o cualquier otra respuesta necesaria
-                    res.json({ message: 'Prescripción guardada exitosamente', pdf: fileName });
-                }
-            });
+            console.error('Error al crear la prescripción:', error);
+            return res.status(500).send('Error interno al crear la prescripción');
         }
+
+        // Generar el PDF
+        pdfGenerator.createPrescriptionPDF(prescripcion, (err, pdfPath) => {
+            if (err) {
+                console.error('Error al generar el PDF:', err);
+                return res.status(500).send('Error interno al generar el PDF');
+            }
+
+            const pdfUrl = `/pdfs/prescripcion_${prescripcion.id_prescripcion}.pdf`;
+            res.json({ prescripcion, pdfUrl });
+        });
     });
 };
-

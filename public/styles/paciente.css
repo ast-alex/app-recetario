@@ -1,0 +1,63 @@
+body {
+    font-family: Roboto, sans-serif;
+    margin: 20px;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+p {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button.btn.btn-secondary {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button.btn.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    color: #007BFF; 
+    text-decoration: none;
+    transition: color 0.3s ease; 
+}
+
+a:hover {
+    color: #0056b3; 
+    text-decoration: underline; 
+}
+
+a:active {
+    color: #004085; 
+}
+
+a:visited {
+    color: #6c757d; 
+}

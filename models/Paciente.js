@@ -1,4 +1,5 @@
 const pool = require('../config/config');
+const SweetAlert2 = require('sweetalert2');
 
 class Paciente {
     constructor(id_paciente, id_plan, nombre, apellido, dni, fecha_nacimiento, sexo) {
@@ -42,8 +43,15 @@ class Paciente {
             if(error) {
                 return callback(error);
             }
+            SweetAlert2.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: 'Paciente agregado correctamente',
+                confirmButtonText: 'Ok'
+            });
             callback(null, results);
-        });
+            }
+        );
     }
 
     static update(id, data, callback) {

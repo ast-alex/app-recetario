@@ -28,10 +28,16 @@ exports.getPacienteById = (req, res) =>{
 
 exports.createPaciente = (req, res) =>{
     Paciente.create(req.body, (error, paciente) =>{
-        if(error){
-            res.status(500).send(error);
-        }
-        else{
+        if (error) {
+            // En caso de error, puedes mostrar SweetAlert2 con un mensaje de error
+            SweetAlert2.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo agregar el paciente',
+                confirmButtonText: 'Ok'
+            });
+            return res.status(500).json({ error: 'Error al agregar paciente' });
+        }else{
             res.redirect('/pacientes')
         }
     });
@@ -80,13 +86,13 @@ exports.deletePaciente = (req, res) =>{
         }
     });
 }
-exports.buscarPacienteDni = (req, res) =>{
+exports.buscarPacienteDni = (req, res) => {
     const dni = req.query.dni;
-    Paciente.getByDni(dni, (error, pacientes) =>{
-        if(error){
+    Paciente.getByDni(dni, (error, pacientes) => {
+        if (error) {
             res.status(500).send(error);
-        }else{
-            res.render('pacientes', {pacientes});
+        } else {
+            res.json(pacientes);
         }
     });
-}
+};

@@ -2,6 +2,7 @@ doctype html
 html
     head
         title= title
+        link(rel='stylesheet' href='/styles/form-pacientes.css')
     body
         h1= title
         form(action=action, method="POST")
@@ -30,3 +31,4 @@ html
             button(type="submit") Guardar
         if volverLista 
             button.btn.btn-secondary(type='button' style='margin-top: 10px;' onclick="window.location.href='/pacientes'") Volver a la lista de pacientes
+        
