@@ -5,6 +5,7 @@ const PDFDocument = require('pdfkit');
 const path = require('path');
 const fs = require('fs');
 const Paciente = require('../models/Paciente'); 
+const Prescripcion = require('../models/Prescripcion');
 const Profesional = require('../models/Profesional'); 
 const Medicamento = require('../models/Medicamento'); 
 const Presentacion = require('../models/Presentacion'); 
@@ -17,7 +18,6 @@ router.get('/new/:id', prescripcionController.mostrarForm);
 router.post('/', async (req, res) => {
     try {
         const { id_paciente, id_profesional_salud, diagnostico, fecha_prescripcion, vigencia, medicamentos, prestaciones } = req.body;
-        
         // Verificar si se han prescrito medicamentos o prestaciones
         if ((!medicamentos || medicamentos.length === 0) && (!prestaciones || prestaciones.length === 0)) {
             return res.status(400).json({ message: 'Debe prescribir al menos un medicamento o una prestación.' });
@@ -104,8 +104,23 @@ router.post('/', async (req, res) => {
             plan,
             obraSocial
         });
-        
-        res.json({ message: 'Prescripción creada', pdfUrl: `/pdfs/${path.basename(pdfPath)}` });
+        // Guardar la prescripción en la base de datos
+        Prescripcion.create({
+            id_paciente,
+            id_profesional_salud,
+            diagnostico,
+            fecha_prescripcion,
+            vigencia,
+            medicamentos: detailedMedicamentos,
+            prestaciones: detailedPrestaciones,
+            pdfUrl: `/pdfs/${path.basename(pdfPath)}`
+        }, (err, nuevaPrescripcion) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: 'Error al crear la prescripción' });
+            }
+            res.json({ message: 'Prescripción creada', pdfUrl: `/pdfs/${path.basename(pdfPath)}` });
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error al crear la prescripción' });

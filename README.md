@@ -13,4 +13,5 @@
 - Las fechas no estan validadas.
 
 - PDFKIT implementado.
+- Dejo un ejemplo en la carpeta 'pdfs'
 

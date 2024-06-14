@@ -3,6 +3,10 @@ html
   head
     title Detalle de Paciente
     link(rel='stylesheet' href='/styles/paciente.css') 
+    script.
+      function navigateTo(url) {
+        window.location.href = url;
+      }
   body
     h1 Detalle de Paciente
     p Nombre: #{paciente.nombre}
@@ -10,9 +14,9 @@ html
     p DNI: #{paciente.dni}
     p Fecha de Nacimiento: #{paciente.fecha_nacimiento}
     p Sexo: #{paciente.sexo}
-    a(href=`/pacientes/edit/${paciente.id_paciente}`) Editar
-    form(action=`/pacientes/${paciente.id_paciente}?_method=DELETE`, method='POST')
-      button(type='submit') Eliminar
-    br
-    a(href=`/prescripciones/new/${paciente.id_paciente}`) Prescribir
-    button.btn.btn-secondary(type='button' style='margin-top: 10px;' onclick="window.location.href='/pacientes'") Volver a la lista de pacientes
+    .buttons-container
+        button(type='button' onclick=`navigateTo('/pacientes/edit/${paciente.id_paciente}')`) Editar
+        form(action=`/pacientes/${paciente.id_paciente}?_method=DELETE`, method='POST')
+          button(type='submit') Eliminar
+        button(type='button' onclick=`navigateTo('/prescripciones/new/${paciente.id_paciente}')`) Prescribir
+        button.btn-secondary(type='button' onclick="navigateTo('/pacientes')") Volver a la lista de pacientes

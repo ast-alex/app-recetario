@@ -25,15 +25,12 @@ html
             td #{paciente.fecha_nacimiento}
             td #{paciente.sexo}
             td
-              a(href=`/pacientes/${paciente.id_paciente}`) Ver
-              |  |
-              // Enlace para prescribir
-              a(href=`/prescripciones/new/${paciente.id_paciente}`) Prescribir
-              |  |
-              // Enlace para editar
-              a(href=`/pacientes/edit/${paciente.id_paciente}`) Editar
-              |  |
-              // Formulario para eliminar
+              form(action=`/pacientes/${paciente.id_paciente}`, method='GET')
+                button(type='submit') Ver
+              form(action=`/prescripciones/new/${paciente.id_paciente}`, method='GET')
+                button(type='submit') Prescribir
+              form(action=`/pacientes/edit/${paciente.id_paciente}`, method='GET')
+                button(type='submit') Editar
               form(action=`/pacientes/${paciente.id_paciente}?_method=DELETE`, method='POST')
                 button(type='submit') Eliminar
     br

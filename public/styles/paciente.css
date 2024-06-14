@@ -6,58 +6,64 @@ body {
 h1 {
     font-size: 24px;
     margin-bottom: 20px;
+    text-align: center;
 }
 
 p {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+button {
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 5px;
     font-size: 16px;
-    margin-bottom: 10px;
-}
-
-a {
-    text-decoration: none;
-    color: #007bff;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-button.btn.btn-secondary {
-    margin-top: 10px;
-    padding: 8px 12px;
-    background-color: #6c757d;
-    color: white;
     border: none;
     border-radius: 4px;
+    text-decoration: none;
+    text-align: center;
     cursor: pointer;
-    font-size: 14px;
+    background-color: #007bff;
+    color: white;
 }
 
-button.btn.btn-secondary:hover {
+button:hover {
+    background-color: #0056b3;
+}
+
+button.btn-secondary {
+    background-color: #6c757d;
+}
+
+button.btn-secondary:hover {
     background-color: #5a6268;
+}
+
+form button[type='submit'] {
+    background-color: #dc3545;
+    color: white;
+}
+
+form button[type='submit']:hover {
+    background-color: #c82333;
 }
 
 form {
     display: inline;
-    margin: 0;
-    padding: 0;
 }
 
-a {
-    color: #007BFF; 
-    text-decoration: none;
-    transition: color 0.3s ease; 
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-a:hover {
-    color: #0056b3; 
-    text-decoration: underline; 
-}
-
-a:active {
-    color: #004085; 
-}
-
-a:visited {
-    color: #6c757d; 
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 }

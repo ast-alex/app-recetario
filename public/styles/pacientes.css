@@ -1,7 +1,5 @@
-/* public/styles/lista-pacientes.css */
-
 body {
-    font-family: Arial, sans-serif;
+    font-family: Roboto, sans-serif;
     margin: 20px;
 }
 
@@ -40,6 +38,11 @@ form button[type="submit"] {
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    margin-right: 5px; /* Espacio entre botones */
+}
+
+form button[type="submit"]:hover {
+    background-color: #0056b3;
 }
 
 table {
@@ -74,6 +77,10 @@ table td form {
     display: inline;
     margin: 0;
     padding: 0;
+}
+
+table td form button {
+    margin-bottom: 5px; /* Espacio vertical entre botones en la misma celda */
 }
 
 a {

@@ -4,7 +4,6 @@ html
     title Prescripción para #{paciente.nombre} #{paciente.apellido}
     link(rel='stylesheet' href='/styles/form-prescripcion.css')
     script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js')
-
   body
     .container
       h1 Prescripción para #{paciente.nombre} #{paciente.apellido}
@@ -42,8 +41,9 @@ html
         button(type='button' onclick='addPrestacion()') Añadir Prestación
 
         // Botones de guardar y volver
-        button(type='submit') Guardar Prescripción
-        button.btn.btn-secondary(type='button' style='margin-top: 10px;' onclick="window.location.href='/pacientes'") Volver a la lista de pacientes
+        .buttons-container
+          button(type='submit') Guardar Prescripción
+          button.btn.btn-secondary(type='button' onclick="window.location.href='/pacientes'") Volver a la lista de pacientes
         
         // Aquí se mostrará el enlace de descarga si el PDF ha sido generado
         div#pdf-link
@@ -167,20 +167,18 @@ html
           } else {
             console.error('PDF URL no encontrada en la respuesta');
           }
-        // Mostrar SweetAlert2 para indicar que se guardó correctamente
+
           Swal.fire({
             title: 'Prescripción enviada correctamente',
             icon: 'success',
             showConfirmButton: false,
             timer: 1500
           });
-
-          // Limpiar el formulario después de mostrar SweetAlert2
+          
           document.getElementById('prescripcionForm').reset();
         })
         .catch(error => {
           console.error('Error:', error);
-          // Mostrar SweetAlert2 para indicar que hubo un error
           Swal.fire({
             title: 'Error al enviar la prescripción',
             text: 'Por favor, intenta nuevamente más tarde',
@@ -189,5 +187,3 @@ html
           });
         });
       });
-
-
