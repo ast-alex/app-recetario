@@ -1,5 +1,7 @@
 ### ACLARACIONES IMPORTANTES
 
+** RUTA http://localhost:8080/ **
+
 -El proyecto no esta terminado, por lo cual faltan cosas...
 
 - Login no implementado.
