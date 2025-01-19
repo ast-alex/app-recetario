@@ -9,7 +9,8 @@ html
             if method === 'PUT'
                 input(type="hidden", name="_method", value="PUT")
             label(for="id_plan") Plan: 
-            input(type="text", name="id_plan", value=paciente ? paciente.id_plan : '')
+            select(name="id_plan", id="id_plan") 
+                option(value="" disable selected) Seleccione un Plan
             br
             label(for="nombre") Nombre:
             input(type="text", name="nombre", value=paciente ? paciente.nombre : '')
@@ -32,3 +33,26 @@ html
         if volverLista 
             button.btn.btn-secondary(type='button' style='margin-top: 10px;' onclick="window.location.href='/pacientes'") Volver a la lista de pacientes
         
+script.
+    document.addEventListener('DOMContentLoaded', () => {
+        const selectPlan = document.getElementById('id_plan');
+
+        // Cargar planes desde el servidor
+        fetch('/planes')
+            .then(response => response.json())
+            .then(planes => {
+                planes.forEach(plan => {
+                    const option = document.createElement('option');
+                    option.value = plan.id_plan;
+                    option.textContent = `${plan.nombre} (Cobertura: ${plan.cobertura})`;
+                    selectPlan.appendChild(option);
+                });
+                
+                // Seleccionar el plan actual si se edita un paciente
+                const currentPlanId = #{paciente ? paciente.id_plan : 'null'};
+                if (currentPlanId) {
+                    selectPlan.value = currentPlanId;
+                }
+            })
+            .catch(error => console.error('Error al cargar los planes:', error));
+    });

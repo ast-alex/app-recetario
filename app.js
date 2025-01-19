@@ -4,6 +4,7 @@ const methodOverride = require("method-override");
 const path = require("path");
 const pacienteRoutes = require('./routes/pacienteRoutes');
 const prescripcionRoutes = require('./routes/prescripcionRoutes');
+const planRoutes = require('./routes/planRoutes');
 const app = express();
 
 app.set('view engine', 'pug');
@@ -21,6 +22,7 @@ app.get('/', (req, res) => {
     res.redirect('/pacientes');
 });
 app.use('/prescripciones', prescripcionRoutes);
+app.use('/planes', planRoutes);
 
 app.use('/pdfs', express.static(path.join(__dirname, 'pdfs')));
 
