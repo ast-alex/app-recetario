@@ -1,7 +1,7 @@
 const pool = require('../config/config');
 
 class ProfesionalSalud {
-    constructor(id_profesional_salud, id_usuario, id_rol, nombre, apellido, dni, profesion, especialidad, domicilio, matricula, id_refeeps, fecha_caducidad, fecha_registro, vigente) {
+    constructor(id_profesional_salud, id_usuario, id_rol, nombre, apellido, dni, profesion, especialidad, domicilio, matricula, id_refeeps, fecha_caducidad, fecha_registro) {
         this.id_profesional_salud = id_profesional_salud;
         this.id_usuario = id_usuario;
         this.id_rol = id_rol;
@@ -15,7 +15,6 @@ class ProfesionalSalud {
         this.id_refeeps = id_refeeps;
         this.fecha_caducidad = fecha_caducidad;
         this.fecha_registro = fecha_registro;
-        this.vigente = vigente;
     }
     static getAll(callback) {
         pool.query('SELECT * FROM profesional_salud', (error, results) => {
@@ -38,6 +37,39 @@ class ProfesionalSalud {
             } else {
                 callback({ message: 'Profesional de salud no encontrado' }, null);
             }
+        });
+    }
+
+    static create(profesional) {
+        return new Promise((resolve, reject) => {
+            const query = `
+            INSERT INTO profesional_salud (id_usuario, id_rol, nombre, apellido, dni, profesion, especialidad, domicilio, matricula, id_refeeps, fecha_caducidad, fecha_registro)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+            pool.query(
+                query,
+                [
+                    profesional.id_usuario,
+                    profesional.id_rol,
+                    profesional.nombre,
+                    profesional.apellido,
+                    profesional.dni,
+                    profesional.profesion,
+                    profesional.especialidad,
+                    profesional.domicilio,
+                    profesional.matricula,
+                    profesional.id_refeeps,
+                    profesional.fecha_caducidad,
+                    profesional.fecha_registro,
+                ],
+                (err, results) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve({ id_profesional_salud: results.insertId, ...profesional });
+                    }
+                }
+            );
         });
     }
     

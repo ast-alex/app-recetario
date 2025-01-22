@@ -1,4 +1,5 @@
 const ProfesionalSalud = require('../models/Profesional.js');
+const Usuario = require('../models/Usuario.js');
 
 const profesionalController = {
     // Obtener todos los profesionales de salud
@@ -50,6 +51,44 @@ const profesionalController = {
             }
         });
     },
+
+    // Crear un profesional de salud
+    createProfesional: async (req, res) => {
+        const { email, password, nombre, apellido, dni, profesion, especialidad, domicilio, matricula, id_refeeps, fecha_caducidad } = req.body;
+
+        if (!email || !password || !nombre || !apellido || !dni || !profesion || !especialidad || !domicilio || !matricula || !id_refeeps || !fecha_caducidad) {
+            return res.status(400).json({ error: 'Todos los campos son obligatorios!!' });
+        }
+
+        try {
+            // Crear usuario con el rol de profesional de salud (id_rol = 1)
+            const usuarioCreado = await Usuario.create({ email, password, id_rol: 1 });
+
+            // Crear profesional de salud
+            const fechaRegistro = new Date();
+            const nuevoProfesional = {
+                id_usuario: usuarioCreado.id_usuario,
+                id_rol: 1,
+                nombre,
+                apellido,
+                dni,
+                profesion,
+                especialidad,
+                domicilio,
+                matricula,
+                id_refeeps,
+                fecha_caducidad,
+                fecha_registro: fechaRegistro,
+            };
+
+            const profesionalCreado = await ProfesionalSalud.create(nuevoProfesional);
+            res.status(201).json({ message: 'Profesional de salud creado', profesional: profesionalCreado });
+        } catch (error) {
+            console.error("Error al crear el profesional de salud:", error);
+            res.status(500).json({ error: "Error interno del servidor" });
+        }
+    }
+
 };
 
 module.exports = profesionalController

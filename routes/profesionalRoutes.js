@@ -11,4 +11,7 @@ router.get('/:id', profesionalController.getProfesionalById);
 // Ruta para validar un ID Refeeps
 router.get('/validar-refeeps/:id_refeeps', profesionalController.validarRefeps);
 
+// Rutas para crear un Profesional de Salud
+router.post('/crear', profesionalController.createProfesional);
+
 module.exports = router;
