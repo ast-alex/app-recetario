@@ -5,6 +5,7 @@ const path = require("path");
 const pacienteRoutes = require('./routes/pacienteRoutes');
 const prescripcionRoutes = require('./routes/prescripcionRoutes');
 const planRoutes = require('./routes/planRoutes');
+const profesionalRoutes = require('./routes/profesionalRoutes');
 const app = express();
 
 app.set('view engine', 'pug');
@@ -21,8 +22,12 @@ app.use('/pacientes', pacienteRoutes);
 app.get('/', (req, res) => {
     res.redirect('/pacientes');
 });
+
 app.use('/prescripciones', prescripcionRoutes);
+
 app.use('/planes', planRoutes);
+
+app.use("/profesionales", profesionalRoutes);
 
 app.use('/pdfs', express.static(path.join(__dirname, 'pdfs')));
 

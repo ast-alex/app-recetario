@@ -1,7 +1,7 @@
 const pool = require('../config/config');
 
 class ProfesionalSalud {
-    constructor(id_profesional_salud, id_usuario, id_rol, nombre, apellido, dni, profesion, especialidad, domicilio, matricula, id_refeeps, fecha_caducidad, fecha_registro){
+    constructor(id_profesional_salud, id_usuario, id_rol, nombre, apellido, dni, profesion, especialidad, domicilio, matricula, id_refeeps, fecha_caducidad, fecha_registro, vigente) {
         this.id_profesional_salud = id_profesional_salud;
         this.id_usuario = id_usuario;
         this.id_rol = id_rol;
@@ -15,6 +15,7 @@ class ProfesionalSalud {
         this.id_refeeps = id_refeeps;
         this.fecha_caducidad = fecha_caducidad;
         this.fecha_registro = fecha_registro;
+        this.vigente = vigente;
     }
     static getAll(callback) {
         pool.query('SELECT * FROM profesional_salud', (error, results) => {
