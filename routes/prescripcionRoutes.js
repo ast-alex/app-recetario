@@ -12,10 +12,11 @@ const Presentacion = require('../models/Presentacion');
 const Prestacion = require('../models/Prestacion'); 
 const ObraSocial = require('../models/ObraSocial'); 
 const Plan = require('../models/Plan');
+const { checkRole, verifyToken } = require('../auth/authMiddleware');
 const { createPrescriptionPDF } = require('../public/pdfGenerator');
 
-router.get('/new/:id', prescripcionController.mostrarForm);
-router.post('/', async (req, res) => {
+router.get('/new/:id', verifyToken, checkRole([1]), prescripcionController.mostrarForm);
+router.post('/', verifyToken, checkRole([1]), async (req, res) => {
     try {
         const { id_paciente, id_profesional_salud, diagnostico, fecha_prescripcion, vigencia, medicamentos, prestaciones } = req.body;
         // Verificar si se han prescrito medicamentos o prestaciones

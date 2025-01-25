@@ -1,0 +1,19 @@
+doctype html
+html
+  head
+    title Login
+    link(rel='stylesheet', href='/css/styles.css')
+  body
+    h1 Login
+    form(action='/auth/login', method='POST')
+      div
+        label(for='email') Email
+        input(type='email', name='email', id='email', required)
+      div
+        label(for='password') Contraseña
+        input(type='password', name='password', id='password', required)
+      button(type='submit') Iniciar sesión
+    if error
+      p(style="color:red")= error
+
+    script(src="/js/auth.js")
