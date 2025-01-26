@@ -72,6 +72,16 @@ class ProfesionalSalud {
             );
         });
     }
+
+    static getByUserId(id_usuario, callback) {
+        const query = 'SELECT * FROM profesional_salud WHERE id_usuario = ?';
+        pool.query(query, [id_usuario], (err, results) => {
+            if (err) {
+                callback(err, null);
+            }
+            callback(null, results[0]);
+        });
+    }
     
 }
 

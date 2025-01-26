@@ -10,6 +10,7 @@ const planRoutes = require('./routes/planRoutes');
 const profesionalRoutes = require('./routes/profesionalRoutes');
 const usuarioAdminRoutes = require('./routes/usuarioRoutes');
 const authRoutes = require('./routes/authRoutes');
+const { verifyToken } = require("./auth/authMiddleware");
 
 const app = express();
 require('dotenv').config();
@@ -23,6 +24,8 @@ app.use(methodOverride('_method'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
+
+app.use(verifyToken);
 
 app.get('/home', (req, res) => {
     //verificar si hay token

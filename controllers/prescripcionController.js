@@ -5,44 +5,59 @@ const Medicamento = require('../models/Medicamento');
 const Presentacion = require('../models/Presentacion'); 
 const Prestacion = require('../models/Prestacion');
 const pdfGenerator = require('../public/pdfGenerator');
+const jwt = require('jsonwebtoken');
 
 
 exports.mostrarForm = (req, res) => {
+    const id_usuario = getUserIdFromToken(req);
     const id_paciente = req.params.id;
-    Paciente.getById(id_paciente, (error, paciente) => {
-        if (error) {
-            return res.status(500).send(error);
-        }
-        // Obtener todos los medicamentos disponibles
-        Medicamento.getAll((error, medicamentos) => {
-            if (error) {
-                return res.status(500).send(error);
-            }
-            // Obtener todas las presentaciones disponibles
-            Presentacion.getAllPresentaciones((error, presentaciones) => {
-                if (error) {
-                    return res.status(500).send(error);
-                }
-                // Obtener todas las prestaciones disponibles
-                Prestacion.getAll((error, prestaciones) => {
-                    if (error) {
-                        return res.status(500).send(error);
-                    }
-                    // Renderizar el formulario con los datos obtenidos
-                    res.render('form-prescripcion', {
-                        paciente,
-                        medicamentos,
-                        presentaciones,
-                        prestaciones
+
+    Profesional.getByUserId(id_usuario, (error, profesional) => {
+        if (error) return res.status(500).send(error);
+        if (!profesional) return res.status(404).send('Profesional de salud no encontrado');
+
+        // Obtener el nombre completo del profesional
+        const fullName = `${profesional.nombre} ${profesional.apellido}`;
+
+        Paciente.getById(id_paciente, (error, paciente) => {
+            if (error) return res.status(500).send(error);
+
+            Medicamento.getAll((error, medicamentos) => {
+                if (error) return res.status(500).send(error);
+
+                Presentacion.getAllPresentaciones((error, presentaciones) => {
+                    if (error) return res.status(500).send(error);
+
+                    Prestacion.getAll((error, prestaciones) => {
+                        if (error) return res.status(500).send(error);
+
+                        // Renderizar el formulario con todos los datos necesarios
+                        res.render('form-prescripcion', {
+                            fullName,
+                            profesional,
+                            paciente,
+                            medicamentos,
+                            presentaciones,
+                            prestaciones,
+                        });
                     });
                 });
             });
         });
     });
 };
+
     
 exports.crearPrescripcion = (req, res) => {
     const { id_profesional_salud, id_paciente, diagnostico, fecha_prescripcion, vigencia } = req.body;
+    const id_usuario = getUserIdFromToken(req);
+
+    Profesional.getByUserId(id_usuario, (error, profesional) => {
+        if (error || !profesional) {
+            return res.status(500).send(error);
+        }
+    })
+
 
     // Validar campos requeridos
     if (!id_profesional_salud || !id_paciente || !diagnostico || !fecha_prescripcion || !vigencia) {
@@ -69,7 +84,7 @@ exports.crearPrescripcion = (req, res) => {
     })) : [];
 
     const prescripcionData = { 
-        id_profesional_salud, 
+        id_profesional_salud: 
         id_paciente, 
         diagnostico, 
         fecha_prescripcion, 
@@ -96,3 +111,15 @@ exports.crearPrescripcion = (req, res) => {
         });
     });
 };
+
+
+//extraer token para obtener id_usuario
+function getUserIdFromToken(req) {
+    const token = req.cookies.token || req.headers['authorization']?.split(' ')[1];
+
+    if (!token) {
+        throw new Error('Token no proporcionado');
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    return decodedToken.id_usuario;
+}

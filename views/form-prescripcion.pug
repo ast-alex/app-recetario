@@ -11,10 +11,10 @@ html
       form(id='prescripcionForm')
         input(type='hidden' name='id_paciente' value=paciente.id_paciente)
 
-        // Datos de la prescripción
         div
-          label(for='id_profesional_salud') Profesional de Salud:
-          input(type='text' name='id_profesional_salud' required)
+          label(for='profesional') Profesional de Salud:
+          input(type='text' name='profesional' value=`${fullName}` readonly)
+          input(type='hidden' name='id_profesional_salud' value=`${profesional.id_profesional_salud}`)
 
         div
           label(for='diagnostico') Diagnóstico:
