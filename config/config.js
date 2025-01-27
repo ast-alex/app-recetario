@@ -3,7 +3,7 @@ const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'app-recetario',
+    database: 'app-receta',
 })
 
 pool.getConnection((err, connection) => {

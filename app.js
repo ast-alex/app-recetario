@@ -65,9 +65,9 @@ app.use('/prescripciones', prescripcionRoutes);
 
 app.use('/planes', planRoutes);
 
-app.use("/profesionales", profesionalRoutes);
+app.use('/profesionales', profesionalRoutes);
 
-app.use("/usuarioAdmin", usuarioAdminRoutes);
+app.use('/usuarioAdmin', usuarioAdminRoutes);
 
 app.use('/pdfs', express.static(path.join(__dirname, 'pdfs')));
 

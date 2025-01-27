@@ -14,7 +14,7 @@ exports.mostrarForm = (req, res) => {
 
     Profesional.getByUserId(id_usuario, (error, profesional) => {
         if (error) return res.status(500).send(error);
-        if (!profesional) return res.status(404).send('Profesional de salud no encontrado');
+        if (!profesional) return res.status(404).send('profesional de salud no encontrado');
 
         // Obtener el nombre completo del profesional
         const fullName = `${profesional.nombre} ${profesional.apellido}`;

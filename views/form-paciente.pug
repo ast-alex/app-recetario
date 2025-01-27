@@ -3,36 +3,65 @@ html
     head
         title= title
         link(rel='stylesheet', href='/styles/styles.css')
-        link(rel='stylesheet' href='/styles/form-pacientes.css')
+        link(rel='stylesheet', href='/styles/form-pacientes.css')
+        link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
+        script(src='https://code.jquery.com/jquery-3.5.1.slim.min.js')
+        script(src='https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js')
+        script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js')
     body
-        h1= title
-        form(action=action, method="POST")
-            if method === 'PUT'
-                input(type="hidden", name="_method", value="PUT")
-            label(for="id_plan") Plan: 
-            select(name="id_plan", id="id_plan") 
-                option(value="" disable selected) Seleccione un Plan
-            br
-            label(for="nombre") Nombre:
-            input(type="text", name="nombre", value=paciente ? paciente.nombre : '')
-            br
-            label(for="apellido") Apellido:
-            input(type="text", name="apellido", value=paciente ? paciente.apellido : '')
-            br
-            label(for="dni") DNI:
-            input(type="text", name="dni", value=paciente ? paciente.dni : '')
-            br
-            label(for="fecha_nacimiento") Fecha de Nacimiento:
-            input(type="date", name="fecha_nacimiento", value=paciente ? paciente.fecha_nacimiento.toISOString().substring(0, 10) : '')
-            br
-            label(for="sexo") Sexo:
-            select(name="sexo")
-                option(value="M" selected=paciente && paciente.sexo === 'M') Masculino
-                option(value="F" selected=paciente && paciente.sexo === 'F') Femenino
-            br
-            button(type="submit") Guardar
-        if volverLista 
-            button.btn.btn-secondary(type='button' style='margin-top: 10px;' onclick="window.location.href='/pacientes'") Volver a la lista de pacientes
+        //- navbar.pug
+        nav.navbar.navbar-expand-lg.navbar-light.bg-light
+            a.navbar-brand(href='/home') Clinica
+            button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+                span.navbar-toggler-icon
+
+            .collapse.navbar-collapse(id='navbarSupportedContent')
+                ul.navbar-nav.mr-auto
+                    li.nav-item.active
+                        a.nav-link(href='/home') Home
+                    li.nav-item
+                        a.nav-link(href='/pacientes') Pacientes
+                    li.nav-item
+                        a.nav-link(href='/profesionales') Profesionales
+                    li.nav-item
+                        a.nav-link(href='/mi-perfil') Mi Perfil
+                ul.navbar-nav.float-right
+                    li.nav-item
+                        a.nav-link(href='/auth/logout') Logout
+                    li.nav-item.dropdown
+                        a.nav-link.dropdown-toggle(id='navbarDropdownMenuLink', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Accounts
+                        .dropdown-menu(aria-labelledby='navbarDropdownMenuLink')
+                            a.dropdown-item(href='#') Settings
+
+        .form-paciente
+            h1= title
+            form(id="form-paciente", action=action, method="POST")
+                if method === 'PUT'
+                    input(type="hidden", name="_method", value="PUT")
+                label(for="id_plan") Plan: 
+                select(name="id_plan", id="id_plan") 
+                    option(value="" disable selected) Seleccione un Plan
+                br
+                label(for="nombre") Nombre:
+                input(type="text", name="nombre", value=paciente ? paciente.nombre : '')
+                br
+                label(for="apellido") Apellido:
+                input(type="text", name="apellido", value=paciente ? paciente.apellido : '')
+                br
+                label(for="dni") DNI:
+                input(type="text", name="dni", value=paciente ? paciente.dni : '')
+                br
+                label(for="fecha_nacimiento") Fecha de Nacimiento:
+                input(type="date", name="fecha_nacimiento", value=paciente ? paciente.fecha_nacimiento.toISOString().substring(0, 10) : '')
+                br
+                label(for="sexo") Sexo:
+                select(name="sexo")
+                    option(value="M" selected=paciente && paciente.sexo === 'M') Masculino
+                    option(value="F" selected=paciente && paciente.sexo === 'F') Femenino
+                br
+                button(type="submit") Guardar
+            if volverLista 
+                button.btn.btn-secondary(type='button' style='margin-top: 10px;' onclick="window.location.href='/pacientes'") Volver a la lista de pacientes
         
 script.
     document.addEventListener('DOMContentLoaded', () => {

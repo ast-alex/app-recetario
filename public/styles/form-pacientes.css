@@ -1,17 +1,10 @@
-/* public/styles/form-pacientes.css */
-
-body {
+/* Encapsulamos estilos específicos para el formulario */
+.form-paciente {
+    margin-top: 20px;
     font-family: Arial, sans-serif;
-    margin: 20px;
 }
 
-h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-/* Agrega estilos específicos para el formulario de pacientes aquí */
-form {
+.form-paciente form {
     max-width: 600px;
     margin: 0 auto;
     background-color: #f0f0f0;
@@ -20,14 +13,14 @@ form {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-form label {
+.form-paciente form label {
     display: block;
     margin-bottom: 8px;
 }
 
-form input[type="text"],
-form input[type="date"],
-form select {
+.form-paciente form input[type="text"],
+.form-paciente form input[type="date"],
+.form-paciente form select {
     width: calc(100% - 12px);
     padding: 8px;
     margin-bottom: 12px;
@@ -36,11 +29,11 @@ form select {
     border-radius: 4px;
 }
 
-form select {
+.form-paciente form select {
     width: 100%;
 }
 
-form button[type="submit"] {
+.form-paciente form button[type="submit"] {
     padding: 10px 20px;
     background-color: #28a745;
     color: white;
@@ -50,25 +43,6 @@ form button[type="submit"] {
     font-size: 16px;
 }
 
-form button[type="submit"]:hover {
+.form-paciente form button[type="submit"]:hover {
     background-color: #218838;
-}
-
-a {
-    color: #007BFF; 
-    text-decoration: none;
-    transition: color 0.3s ease; 
-}
-
-a:hover {
-    color: #0056b3; 
-    text-decoration: underline; 
-}
-
-a:active {
-    color: #004085; 
-}
-
-a:visited {
-    color: #6c757d; 
 }
