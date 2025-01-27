@@ -25,7 +25,13 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
-app.use(verifyToken);
+app.use((req, res, next) => {
+    const excludesPaths = [ '/' ,'/auth/login', '/auth/logout'];
+    if (excludesPaths.includes(req.path)) {
+       return next();
+    } 
+    verifyToken(req, res, next);// verificar el token para las demas rutas
+});
 
 app.get('/home', (req, res) => {
     //verificar si hay token
@@ -42,6 +48,7 @@ app.get('/home', (req, res) => {
         res.render('home', { message: 'Bienvenido al sistema' });
     }catch(error){
         console.log('Error al verificar el token', error);
+        res.clearCookie('token'); // eliminar cualquier token invalido
         return res.redirect('/auth/login');
     }
 })

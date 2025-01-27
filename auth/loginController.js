@@ -19,7 +19,7 @@ const login = async (req, res) => {
         }
 
         //comparar password con la base de datos
-        const isMatch = password === usuario.password;
+        const isMatch = await bycrpt.compare(password, usuario.password);
 
         if (!isMatch) {
             return res.status(400).json({ error: 'Contraseña incorrecta.' });

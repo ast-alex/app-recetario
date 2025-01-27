@@ -15,7 +15,7 @@ router.post('/login', loginController.login);
 // Ruta para cerrar sesión
 router.get('/logout', (req, res) => {
     res.clearCookie('token'); // Eliminar el token de la cookie
-    res.redirect('/login'); // Redirigir a la página de inicio de sesión
+    res.redirect('/auth/login'); // Redirigir a la página de inicio de sesión
 });
 
 module.exports = router;

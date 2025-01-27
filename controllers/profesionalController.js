@@ -1,5 +1,6 @@
 const ProfesionalSalud = require('../models/Profesional.js');
 const Usuario = require('../models/Usuario.js');
+const bcrypt = require('bcryptjs');
 
 const profesionalController = {
     // Obtener todos los profesionales de salud
@@ -61,8 +62,13 @@ const profesionalController = {
         }
 
         try {
+            
+            // Hash del password
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            
             // Crear usuario con el rol de profesional de salud (id_rol = 1)
-            const usuarioCreado = await Usuario.create({ email, password, id_rol: 1 });
+            const usuarioCreado = await Usuario.create({ email, password: hashedPassword, id_rol: 1 });
 
             // Crear profesional de salud
             const fechaRegistro = new Date();

@@ -2,8 +2,35 @@ doctype html
 html
   head
     title Inicio
-    link(rel='stylesheet', href='/css/styles.css')
+    link(rel='stylesheet', href='/styles/styles.css')
+    link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
+    script(src='https://code.jquery.com/jquery-3.5.1.slim.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js')
+    script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js')
   body
+    //- navbar.pug
+    nav.navbar.navbar-expand-lg.navbar-light.bg-light
+      a.navbar-brand(href='#') Clinica
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+        span.navbar-toggler-icon
+
+      .collapse.navbar-collapse(id='navbarSupportedContent')
+        ul.navbar-nav.mr-auto
+          li.nav-item.active
+            a.nav-link(href='#') Home
+          li.nav-item
+            a.nav-link(href='/pacientes') Pacientes
+          li.nav-item
+            a.nav-link(href='/profesionales') Profesionales
+          li.nav-item
+            a.nav-link(href='/mi-perfil') Mi Perfil
+        ul.navbar-nav.float-right
+          li.nav-item
+            a.nav-link(href='/auth/logout') Logout
+          li.nav-item.dropdown
+            a.nav-link.dropdown-toggle(id='navbarDropdownMenuLink', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Accounts
+            .dropdown-menu(aria-labelledby='navbarDropdownMenuLink')
+              a.dropdown-item(href='#') Settings
     h1 Bienvenido!
     ul
       li
@@ -12,5 +39,7 @@ html
         a(href='/profesionales') Ver Profesionales
       li
         a(href='/medicamentos') Ver Medicamentos
-    a(href='/logout') Cerrar sesion
+    
+
+
     
