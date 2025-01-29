@@ -58,7 +58,7 @@ const profesionalController = {
         const { email, password, nombre, apellido, dni, profesion, especialidad, domicilio, matricula, id_refeeps, fecha_caducidad } = req.body;
 
         if (!email || !password || !nombre || !apellido || !dni || !profesion || !especialidad || !domicilio || !matricula || !id_refeeps || !fecha_caducidad) {
-            return res.status(400).json({ error: 'Todos los campos son obligatorios!!' });
+            return res.status(400).render('form-profesional', { mensajeError: 'Todos los campos son obligatorios!!' });
         }
 
         try {
@@ -88,10 +88,10 @@ const profesionalController = {
             };
 
             const profesionalCreado = await ProfesionalSalud.create(nuevoProfesional);
-            res.status(201).json({ message: 'Profesional de salud creado', profesional: profesionalCreado });
+            res.redirect('/profesionales/crear?success=1');
         } catch (error) {
             console.error("Error al crear el profesional de salud:", error);
-            res.status(500).json({ error: "Error interno del servidor" });
+            res.status(500).render('form-profesional', { MensajeError: "Error interno del servidor" });
         }
     }
 

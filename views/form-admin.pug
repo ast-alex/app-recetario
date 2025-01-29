@@ -1,9 +1,9 @@
 doctype html
 html
   head
-    title Crear Profesional de Salud
+    title Crear Usuario Administrador
     link(rel="stylesheet", href="/styles/styles.css") 
-    link(rel="stylesheet", href="/styles/form-profesional.css") 
+    link(rel="stylesheet", href="/styles/form-admin.css") 
     link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
     script(src='https://code.jquery.com/jquery-3.5.1.slim.min.js')
     script(src='https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js')
@@ -34,7 +34,7 @@ html
             .dropdown-menu(aria-labelledby='navbarDropdownMenuLink')
               a.dropdown-item(href='#') Settings
     
-    h1 Crear Profesional de Salud
+    h1 Crear Administrador
 
     // Mostrar alerta si existe error o éxito
     if mensajeError
@@ -59,13 +59,13 @@ html
 
     .container
       .left-column
-        h2 Lista de Profesionales
+        h2 Lista de Administradores
         ul
-          each profesional in profesionales
-            li #{profesional.nombre} #{profesional.apellido} - #{profesional.profesion} - #{profesional.especialidad}
+          each usuario in usuarios
+            li #{usuario.email} #{usuario.id_rol} 
 
       .right-column
-        form(action="/profesionales/crear" method="POST" id="formProfesional")
+        form(action="/usuarioAdmin/crear-admin" method="POST" id="formAdmin")
           div
             label(for="email") Email
             input(type="email" name="email" id="email" required)
@@ -74,47 +74,11 @@ html
             label(for="password") Contraseña
             input(type="password" name="password" id="password" required)
 
-          div
-            label(for="nombre") Nombre
-            input(type="text" name="nombre" id="nombre" required)
-
-          div
-            label(for="apellido") Apellido
-            input(type="text" name="apellido" id="apellido" required)
-
-          div
-            label(for="dni") DNI
-            input(type="text" name="dni" id="dni" required)
-
-          div
-            label(for="profesion") Profesión
-            input(type="text" name="profesion" id="profesion" required)
-
-          div
-            label(for="especialidad") Especialidad
-            input(type="text" name="especialidad" id="especialidad" required)
-
-          div
-            label(for="domicilio") Domicilio
-            input(type="text" name="domicilio" id="domicilio" required)
-
-          div
-            label(for="matricula") Matrícula
-            input(type="text" name="matricula" id="matricula" required)
-
-          div
-            label(for="id_refeeps") ID RefEEPS
-            input(type="text" name="id_refeeps" id="id_refeeps" required)
-
-          div
-            label(for="fecha_caducidad") Fecha de Caducidad
-            input(type="date" name="fecha_caducidad" id="fecha_caducidad" required)
-
-          button(type="submit") Crear Profesional
+          button(type="submit") Crear Admin
 
     script.
       // Limpiar formulario y actualizar vista al enviarlo exitosamente
-      const form = document.getElementById('formProfesional');
+      const form = document.getElementById('formAdmin');
       form.addEventListener('submit', (event) => {
         setTimeout(() => {
           form.reset();

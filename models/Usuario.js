@@ -1,6 +1,31 @@
 const pool = require('../config/config');
 
 class Usuario {
+    
+    // obtenr todos los usuarios ADMIN
+    static getAllAdmin(callback) {
+        pool.query('SELECT * FROM usuario WHERE id_rol = 2', (error, results) => {
+            if(error) {
+                throw error;
+            }
+            callback(null, results); 
+        })
+    }
+
+    // obtenr todos los usuarios
+    static getAll() {
+        return new Promise((resolve, reject) => {
+            const query = 'SELECT * FROM usuario';
+            pool.query(query, (err, results) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
+            });
+        });
+    }
+
     static create(usuario) {
         return new Promise((resolve, reject) => {
             const query = `
