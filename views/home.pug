@@ -1,45 +1,98 @@
-doctype html
+doctype html 
 html
   head
-    title Inicio
-    link(rel='stylesheet', href='/styles/styles.css')
+    title Inicio - Clínica
+    link(rel='stylesheet', href='/styles/home.css')
     link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
-    script(src='https://code.jquery.com/jquery-3.5.1.slim.min.js')
-    script(src='https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js')
-    script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
+    script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js')
+
   body
-    //- navbar.pug
-    nav.navbar.navbar-expand-lg.navbar-light.bg-light
-      a.navbar-brand(href='/home') Clinica
-      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-primary
+      a.navbar-brand(href='/home')
+        i.fas.fa-clinic-medical.mr-2
+        | Clínica
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNav')
         span.navbar-toggler-icon
-
-      .collapse.navbar-collapse(id='navbarSupportedContent')
+      .collapse.navbar-collapse#navbarNav
         ul.navbar-nav.mr-auto
-          li.nav-item.active
-            a.nav-link(href='/home') Home
-          li.nav-item
-            a.nav-link(href='/pacientes') Pacientes
-          li.nav-item
-            a.nav-link(href='/profesionales') Profesionales
-          li.nav-item
-            a.nav-link(href='/mi-perfil') Mi Perfil
-        ul.navbar-nav.float-right
-          li.nav-item
-            a.nav-link(href='/auth/logout') Logout
-          li.nav-item.dropdown
-            a.nav-link.dropdown-toggle(id='navbarDropdownMenuLink', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Accounts
-            .dropdown-menu(aria-labelledby='navbarDropdownMenuLink')
-              a.dropdown-item(href='#') Settings
-    h1 Bienvenido!
-    ul
-      li
-        a(href='/pacientes') Ver Pacientes
-      li
-        a(href='/profesionales') Ver Profesionales
-      li
-        a(href='/medicamentos') Ver Medicamentos
-    
+          if usuario.id_rol === 1
+            li.nav-item
+              a.nav-link(href='/pacientes')
+                i.fas.fa-user-injured.mr-1
+                | Pacientes
+            li.nav-item
+              a.nav-link(href='/prescripciones/mis-prescripciones')
+                i.fas.fa-prescription.mr-1
+                | Prescripciones
+            li.nav-item
+              a.nav-link(href='usuarioAdmin/miperfil')
+                i.fas.fa-user-circle.mr-1
+                | Mi Perfil
 
+        ul.navbar-nav.ml-auto
+          li.nav-item
+            a.nav-link(href='/auth/logout') Cerrar sesión
+  
+    .container.mt-5
+      h1.text-center Bienvenido, #{usuario.email}
+      h3.text-center.text-muted Rol: #{usuario.id_rol === 1 ? 'Profesional de la Salud' : 'Administrador'}
 
-    
+      if denegado
+        .alert.alert-danger.mt-4 Acceso denegado: no tienes permisos para acceder a esta sección.
+
+      .row.mt-4
+        if usuario.id_rol === 1
+          // Profesional de salud - cards
+          .col-md-4.mb-4
+            a(href='/pacientes', class='text-decoration-none')
+              .card.text-center.shadow
+                .card-body
+                  i.fas.fa-users.fa-3x.mb-2.text-primary
+                  h5 Pacientes
+          .col-md-4.mb-4
+            a(href='/prescripciones/mis-prescripciones', class='text-decoration-none')
+              .card.text-center.shadow
+                .card-body
+                  i.fas.fa-prescription-bottle-alt.fa-3x.mb-2.text-success
+                  h5 Prescripciones
+          .col-md-4.mb-4
+            a(href='usuarioAdmin/miperfil', class='text-decoration-none')
+              .card.text-center.shadow
+                .card-body
+                  i.fas.fa-user-md.fa-3x.mb-2.text-info
+                  h5 Mi Perfil
+
+        else if usuario.id_rol === 2
+          // Admin - cards
+          .col-md-4.mb-4
+            a(href='/pacientes', class='text-decoration-none')
+              .card.text-center.shadow
+                .card-body
+                  i.fas.fa-users.fa-3x.mb-2.text-primary
+                  h5 Pacientes
+          .col-md-4.mb-4
+            a(href='/profesionales', class='text-decoration-none')
+              .card.text-center.shadow
+                .card-body
+                  i.fas.fa-user-md.fa-3x.mb-2.text-info
+                  h5 Profesionales
+          .col-md-4.mb-4
+            a(href='/medicamentos', class='text-decoration-none')
+              .card.text-center.shadow
+                .card-body
+                  i.fas.fa-pills.fa-3x.mb-2.text-warning
+                  h5 Medicamentos
+          .col-md-4.mb-4
+            a(href='/usuarioAdmin/crear-admin', class='text-decoration-none')
+              .card.text-center.shadow
+                .card-body
+                  i.fas.fa-user-plus.fa-3x.mb-2.text-success
+                  h5 Crear Admin
+          .col-md-4.mb-4
+            a(href='usuarioAdmin/miperfil', class='text-decoration-none')
+              .card.text-center.shadow
+                .card-body
+                  i.fas.fa-id-badge.fa-3x.mb-2.text-secondary
+                  h5 Mi Perfil
+                  

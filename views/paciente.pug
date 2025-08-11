@@ -2,50 +2,114 @@ doctype html
 html
   head
     title Detalle de Paciente
-    link(rel='stylesheet', href='/styles/styles.css')
-    link(rel='stylesheet' href='/styles/paciente.css') 
+    link(rel='stylesheet', href='/styles/paciente.css')
     link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
     script(src='https://code.jquery.com/jquery-3.5.1.slim.min.js')
     script(src='https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js')
     script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js')
     script.
       function navigateTo(url) {
         window.location.href = url;
       }
-  body
-    //- navbar.pug
-    nav.navbar.navbar-expand-lg.navbar-light.bg-light
-      a.navbar-brand(href='/home') Clinica
-      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
-        span.navbar-toggler-icon
 
-      .collapse.navbar-collapse(id='navbarSupportedContent')
+  body
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-primary.mb-4
+      a.navbar-brand(href='/home')
+        i.fas.fa-clinic-medical.mr-2
+        | Clínica
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent')
+        span.navbar-toggler-icon
+      .collapse.navbar-collapse#navbarSupportedContent
         ul.navbar-nav.mr-auto
           li.nav-item.active
-            a.nav-link(href='/home') Home
+            a.nav-link(href='/home')
+              i.fas.fa-home.mr-1
+              | Home
           li.nav-item
-            a.nav-link(href='/pacientes') Pacientes
+            a.nav-link(href='/pacientes')
+              i.fas.fa-user-injured.mr-1
+              | Pacientes
           li.nav-item
-            a.nav-link(href='/profesionales') Profesionales
+            a.nav-link(href='/prescripciones/mis-prescripciones')
+              i.fas.fa-prescription.mr-1
+              | Prescripciones
           li.nav-item
-            a.nav-link(href='/mi-perfil') Mi Perfil
-        ul.navbar-nav.float-right
+            a.nav-link(href='/mi-perfil')
+              i.fas.fa-user-circle.mr-1
+              | Mi Perfil
+        ul.navbar-nav.ml-auto
           li.nav-item
-            a.nav-link(href='/auth/logout') Logout
-          li.nav-item.dropdown
-            a.nav-link.dropdown-toggle(id='navbarDropdownMenuLink', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Accounts
-            .dropdown-menu(aria-labelledby='navbarDropdownMenuLink')
-              a.dropdown-item(href='#') Settings
+            a.nav-link(href='/auth/logout')
+              i.fas.fa-sign-out-alt.mr-1
+              | Logout
 
-    h1 Detalle de Paciente
-    p Nombre: #{paciente.nombre}
-    p Apellido: #{paciente.apellido}
-    p DNI: #{paciente.dni}
-    p Fecha de Nacimiento: #{paciente.fecha_nacimiento}
-    p Sexo: #{paciente.sexo}
-    .buttons-container
-        button(type='button' onclick=`navigateTo('/pacientes/edit/${paciente.id_paciente}')`) Editar
-        form(action=`/pacientes/${paciente.id_paciente}?_method=DELETE`, method='POST')
-          button(type='submit') Eliminar
-        button(type='button' onclick=`navigateTo('/prescripciones/new/${paciente.id_paciente}')`) Prescribir
-        button.btn-secondary(type='button' onclick="navigateTo('/pacientes')") Volver a la lista de pacientes
+
+    .container.mt-5
+      .card.shadow
+        .card-header.bg-primary.text-white
+          h3.mb-0 Detalle del Paciente
+        .card-body
+          dl.row
+            dt.col-sm-4 Nombre:
+            dd.col-sm-8 #{paciente.nombre}
+
+            dt.col-sm-4 Apellido:
+            dd.col-sm-8 #{paciente.apellido}
+
+            dt.col-sm-4 DNI:
+            dd.col-sm-8 #{paciente.dni}
+
+            dt.col-sm-4 Fecha de Nacimiento:
+            - const fecha = new Date(paciente.fecha_nacimiento)
+            - const fechaFormateada = fecha.toLocaleDateString('es-AR')
+            dd.col-sm-8 #{fechaFormateada}
+
+
+            dt.col-sm-4 Sexo:
+            dd.col-sm-8 #{paciente.sexo}
+
+      .mt-4.text-center
+        button.btn.btn-outline-warning.mr-2(type='button', onclick=`navigateTo('/pacientes/edit/${paciente.id_paciente}')`)
+          i.fas.fa-edit.mr-1
+          | Editar
+        button.btn.btn-outline-info.mr-2(type='button', onclick=`navigateTo('/prescripciones/new/${paciente.id_paciente}')`)
+          i.fas.fa-notes-medical.mr-1
+          | Prescribir
+        form.d-inline(action=`/pacientes/${paciente.id_paciente}?_method=DELETE`, method='POST')
+          button.btn.btn-outline-danger(type='submit')
+            i.fas.fa-trash.mr-1
+            | Eliminar
+        button.btn.btn-outline-secondary.ml-2(type='button', onclick="navigateTo('/pacientes')")
+          i.fas.fa-arrow-left.mr-1
+          | Volver
+
+    script(src="/js/auth.js")
+    script.
+      document.addEventListener('DOMContentLoaded', () => {
+        const eliminarForm = document.querySelector('form[action*="?_method=DELETE"]');
+        if (eliminarForm) {
+          eliminarForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const confirmed = await Swal.fire({
+              title: '¿Eliminar paciente?',
+              text: 'Esta acción no se puede deshacer.',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Sí, eliminar',
+              cancelButtonText: 'Cancelar'
+            });
+            if (confirmed.isConfirmed) {
+              const action = eliminarForm.getAttribute('action');
+              const res = await realizarSolicitudProtegida(action, { method: 'DELETE' });
+              if (res && res.success) {
+                Swal.fire('Eliminado', res.message || 'Paciente eliminado.', 'success')
+                  .then(() => window.location.href = '/pacientes');
+              } else {
+                Swal.fire('Error', res?.error || 'No se pudo eliminar.', 'error');
+              }
+            }
+          });
+        }
+      });

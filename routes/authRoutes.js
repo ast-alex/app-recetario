@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 
 // Ruta para mostrar la vista de login
 router.get('/login', (req, res) => {
+    console.log('Recibida solicitud de login');
     res.render('login', { error: null }); // Renderizar el formulario de login
 });
 

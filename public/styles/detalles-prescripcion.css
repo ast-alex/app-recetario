@@ -1,0 +1,90 @@
+body {
+  background-color: #f5f7fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 30px 15px;
+}
+
+h1 {
+  color: #007bff;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.card-prescripcion {
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+  padding: 25px;
+}
+
+.card-section {
+  margin-bottom: 30px;
+}
+
+.card-section h4 {
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 6px;
+  margin-bottom: 15px;
+  color: #007bff;
+}
+
+.card-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.card-section li {
+  padding: 8px 12px;
+  background-color: #f1f3f5;
+  margin-bottom: 8px;
+  border-radius: 5px;
+}
+
+.card-section li strong {
+  color: #343a40;
+}
+
+.medicamento-item, .prestacion-item {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  transition: all 0.2s ease;
+}
+
+.medicamento-item:hover, .prestacion-item:hover {
+  background-color: #e2e6ea;
+  transform: scale(1.01);
+}
+
+.prestacion-item.completada {
+  border-left: 5px solid #28a745;
+  background-color: #eafaf1;
+}
+
+.prestacion-item.pendiente {
+  border-left: 5px solid #ffc107;
+  background-color: #fffbea;
+}
+
+.back-button {
+  margin-top: 30px;
+}
+
+.back-button a {
+  color: #ffffff;
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.back-button a:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}

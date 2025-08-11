@@ -6,27 +6,18 @@ class ObraSocial {
         this.nombre = nombre;
     }
 
-    static getAll(callback) {
-        pool.query('SELECT * FROM obrasocial', (error, results) => {
-            if (error) {
-                return callback(error, null);
-            }
-            const obrasSociales = results.map(row => new ObraSocial(row.id_obra_social, row.nombre));
-            callback(null, obrasSociales);
-        });
+    static async getAll() {
+        const [results] = await pool.query('SELECT * FROM obrasocial');
+        return results.map(row => new ObraSocial(row.id_obra_social, row.nombre));
     }
 
-    static getById(id, callback) {
-        pool.query('SELECT * FROM obrasocial WHERE id_obra_social = ?', [id], (err, results) => {
-            if (err) {
-                return callback(err, null);
-            }
-            if (results.length) {
-                callback(null, new ObraSocial(results[0].id_obra_social, results[0].nombre));
-            } else {
-                callback({ message: 'Obra social no encontrada' }, null);
-            }
-        });
+    static async getById(id) {
+        const [results] = await pool.query('SELECT * FROM obrasocial WHERE id_obra_social = ?', [id]);
+        if (results.length) {
+            const row = results[0];
+            return new ObraSocial(row.id_obra_social, row.nombre);
+        }
+        throw new Error('Obra social no encontrada');
     }
 }
 

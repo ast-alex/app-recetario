@@ -1,14 +1,14 @@
 const Plan = require('../models/Plan');
 
 const PlanController = {
-    getPlanes: (req, res) => {
-        Plan.getAll((error, planes) => {
-            if (error) {
-                console.error(error);
-                res.status(500).json({ message: 'Error al obtener los planes' });
-            }
+    getPlanes: async (req, res) => {
+        try {
+            const planes = await Plan.getAll();
             res.json(planes);
-        });
+        } catch (error) {
+            console.error('Error al obtener planes:', error);
+            res.status(500).json({ error: 'Error al obtener planes' });
+        }
     }
 };
 

@@ -1,0 +1,102 @@
+doctype html
+html
+  head
+    title Detalles del Medicamento
+    link(rel='stylesheet' href='/styles/detalle-medicamento.css')
+    link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
+    script(src='https://code.jquery.com/jquery-3.5.1.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js')
+    script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js')
+  body
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-primary
+      a.navbar-brand(href='/home')
+        i.fas.fa-clinic-medical.mr-2
+        | Clínica
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+        span.navbar-toggler-icon
+
+      .collapse.navbar-collapse#navbarSupportedContent
+        ul.navbar-nav.mr-auto
+          li.nav-item
+            a.nav-link(href='/home')
+              i.fas.fa-home.mr-1
+              | Inicio
+          li.nav-item
+            a.nav-link(href='/pacientes')
+              i.fas.fa-user-injured.mr-1
+              | Pacientes
+          li.nav-item
+            a.nav-link(href='/profesionales')
+              i.fas.fa-user-md.mr-1
+              | Profesionales
+          li.nav-item
+            a.nav-link(href='/medicamentos')
+              i.fas.fa-pills.mr-1
+              | Medicamentos
+          li.nav-item
+            a.nav-link(href='usuarioAdmin/miperfil')
+              i.fas.fa-user-circle.mr-1
+              | Mi Perfil
+        ul.navbar-nav.ml-auto
+          li.nav-item
+            a.nav-link(href='/auth/logout')
+              i.fas.fa-sign-out-alt.mr-1
+              | Cerrar sesión
+
+    .container.mt-5
+      a.btn.btn-secondary.mb-4(href='/medicamentos')
+        i.fas.fa-arrow-left.mr-1
+        | Volver a la lista
+
+      .card.mb-4.shadow-sm
+        .card-body
+          h2.mb-3 #{medicamento.nombre_generico}
+          p
+            strong Estado:
+            if medicamento.estado === 'activo' || medicamento.estado === 1
+              span.badge.badge-success.ml-2 Activo
+            else if medicamento.estado === 'inactivo' || medicamento.estado === 0
+              span.badge.badge-danger.ml-2 Inactivo
+            else
+              span.badge.badge-secondary.ml-2 Desconocido
+
+          p.mb-1
+            strong Categoría:
+            if medicamento.categoria && medicamento.categoria.nombre
+              |  #{medicamento.categoria.nombre}
+            else
+              |  No especificada
+
+          p
+            strong Familia:
+            if medicamento.familia && medicamento.familia.nombre
+              |  #{medicamento.familia.nombre}
+            else
+              |  No especificada
+
+      h3.mb-3 Presentaciones
+      if medicamento.presentaciones.length > 0
+        each p in medicamento.presentaciones
+          .card.mb-3.shadow-sm
+            .card-body
+              h5 #{p.nombre_comercial}
+              ul.mb-0
+                li
+                  strong Cantidad de Unidades:
+                  |  #{p.cantidad_unidades}
+                li
+                  strong Concentración:
+                  if p.concentracion && p.concentracion.valor
+                    |  #{p.concentracion.valor}
+                  else
+                    |  No especificada
+                li
+                  strong Forma Farmacéutica:
+                  if p.forma_farmaceutica && p.forma_farmaceutica.nombre
+                    |  #{p.forma_farmaceutica.nombre}
+                  else
+                    |  No especificada
+      else
+        p.text-muted No hay presentaciones registradas.

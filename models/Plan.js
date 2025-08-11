@@ -8,27 +8,18 @@ class Plan {
         this.cobertura = cobertura;
     }
 
-    static getAll(callback) {
-        pool.query('SELECT * FROM plan', (error, results) => {
-            if (error) {
-                return callback(error, null);
-            }
-            const planes = results.map(row => new Plan(row.id_plan, row.id_obra_social, row.nombre, row.cobertura));
-            callback(null, planes);
-        });
+    static async getAll() {
+        const [results] = await pool.query('SELECT * FROM plan');
+        return results.map(row => new Plan(row.id_plan, row.id_obra_social, row.nombre, row.cobertura));
     }
 
-    static getById(id, callback) {
-        pool.query('SELECT * FROM plan WHERE id_plan = ?', [id], (err, results) => {
-            if (err) {
-                return callback(err, null);
-            }
-            if (results.length) {
-                callback(null, new Plan(results[0].id_plan, results[0].id_obra_social, results[0].nombre, results[0].cobertura));
-            } else {
-                callback({ message: 'Plan no encontrado' }, null);
-            }
-        });
+    static async getById(id) {
+        const [results] = await pool.query('SELECT * FROM plan WHERE id_plan = ?', [id]);
+        if (results.length) {
+            const row = results[0];
+            return new Plan(row.id_plan, row.id_obra_social, row.nombre, row.cobertura);
+        }
+        throw new Error('Plan no encontrado');
     }
 }
 

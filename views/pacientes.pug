@@ -2,64 +2,184 @@ doctype html
 html
   head
     title Lista de Pacientes
-    link(rel='stylesheet', href='/styles/styles.css')
-    link(rel='stylesheet' href='/styles/pacientes.css')
+    link(rel='stylesheet', href='/styles/pacientes.css')
     link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
     script(src='https://code.jquery.com/jquery-3.5.1.slim.min.js')
     script(src='https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js')
     script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js')
+
   body
-    //- navbar.pug
-    nav.navbar.navbar-expand-lg.navbar-light.bg-light
-      a.navbar-brand(href='/home') Clinica
-      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-primary.mb-4
+      a.navbar-brand(href='/home')
+        i.fas.fa-clinic-medical.mr-2
+        | Clínica
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent')
         span.navbar-toggler-icon
-
-      .collapse.navbar-collapse(id='navbarSupportedContent')
+      .collapse.navbar-collapse#navbarSupportedContent
         ul.navbar-nav.mr-auto
-          li.nav-item.active
-            a.nav-link(href='/home') Home
           li.nav-item
-            a.nav-link(href='/pacientes') Pacientes
+            a.nav-link(href='/home')
+              i.fas.fa-home.mr-1
+              | Home
           li.nav-item
-            a.nav-link(href='/profesionales') Profesionales
+            a.nav-link(href='/pacientes')
+              i.fas.fa-user-injured.mr-1
+              | Pacientes
           li.nav-item
-            a.nav-link(href='/mi-perfil') Mi Perfil
-        ul.navbar-nav.float-right
+            a.nav-link(href='/prescripciones/mis-prescripciones')
+              i.fas.fa-prescription.mr-1
+              | Prescripciones
           li.nav-item
-            a.nav-link(href='/auth/logout') Logout
-          li.nav-item.dropdown
-            a.nav-link.dropdown-toggle(id='navbarDropdownMenuLink', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Accounts
-            .dropdown-menu(aria-labelledby='navbarDropdownMenuLink')
-              a.dropdown-item(href='#') Settings  
-  
-    h1 Lista de Pacientes
-    a(href='/pacientes/new') Nuevo Paciente
+            a.nav-link(href='/mi-perfil')
+              i.fas.fa-user-circle.mr-1
+              | Mi Perfil
+        ul.navbar-nav.ml-auto
+          li.nav-item
+            a.nav-link(href='/auth/logout')
+              i.fas.fa-sign-out-alt.mr-1
+              | Logout
 
-    table
-      thead
-        tr
-          th Nombre
-          th Apellido
-          th DNI
-          th Fecha de Nacimiento
-          th Sexo
-          th Acciones
-      tbody
-        each paciente in pacientes
-          tr
-            td #{paciente.nombre}
-            td #{paciente.apellido}
-            td #{paciente.dni}
-            td #{paciente.fecha_nacimiento}
-            td #{paciente.sexo}
-            td
-              form(action=`/pacientes/${paciente.id_paciente}`, method='GET')
-                button(type='submit') Ver
-              form(action=`/prescripciones/new/${paciente.id_paciente}`, method='GET')
-                button(type='submit') Prescribir
-              form(action=`/pacientes/edit/${paciente.id_paciente}`, method='GET')
-                button(type='submit') Editar
-              form(action=`/pacientes/${paciente.id_paciente}?_method=DELETE`, method='POST')
-                button(type='submit') Eliminar
-    br
+
+    .container
+      .d-flex.justify-content-between.align-items-center.mb-4
+        h1.mb-0 Lista de Pacientes
+        a.btn.btn-success(href='/pacientes/new')
+          i.fas.fa-user-plus.mr-2
+          | Nuevo Paciente
+      
+      // Filtro por estado activo/inactivo/todos
+      .mb-3
+        label.mr-2(for='filtroEstado') Filtrar por estado:
+        select#filtroEstado.form-control.d-inline-block(style='width: 200px;')
+          option(value='todos', selected) Todos
+          option(value='activos') Activos
+          option(value='inactivos') Inactivos
+
+      if error_msg
+        .alert.alert-danger #{error_msg}
+
+      if pacientes.length === 0
+        .alert.alert-info.mt-4 No hay pacientes registrados.
+      else
+        .table-responsive
+          table.table.table-hover.shadow-sm.rounded#tablaPacientes
+            thead.thead-light
+              tr
+                th Nombre
+                th Apellido
+                th DNI
+                th Fecha de Nacimiento
+                th Sexo
+                th Estado
+                th.text-center Acciones
+            tbody
+              each paciente in pacientes
+                - const fecha = new Date(paciente.fecha_nacimiento)
+                - const fechaFormateada = fecha.toLocaleDateString('es-AR')
+                
+                tr(data-activo=paciente.activo)
+                  td #{paciente.nombre}
+                  td #{paciente.apellido}
+                  td #{paciente.dni}
+                  td #{fechaFormateada}
+                  td #{paciente.sexo}
+                  td
+                    if paciente.activo === 'activo'
+                      span.badge.badge-success Activo
+                    else
+                      span.badge.badge-danger Inactivo
+                  td.text-center
+                    button.btn.btn-outline-info.btn-sm.mr-1.btn-ver(title="Ver detalles", data-id=paciente.id_paciente)
+                      i.fas.fa-eye
+                    if paciente.activo === 'activo'
+                      button.btn.btn-outline-primary.btn-sm.mr-1.btn-prescribir(title="Crear prescripción", data-id=paciente.id_paciente)
+                        i.fas.fa-notes-medical
+                    button.btn.btn-outline-warning.btn-sm.mr-1.btn-editar(title="Editar paciente", data-id=paciente.id_paciente)
+                      i.fas.fa-edit
+                    form.d-inline.activar-desactivar-form(method='POST', action=`/pacientes/${paciente.id_paciente}/estado`, data-nombre=`${paciente.nombre} ${paciente.apellido}`, data-estado=`${paciente.activo}`)
+                      input(type='hidden', name='_method', value='PUT')
+                      button.btn.btn-sm(type='submit', class=paciente.activo === 'activo' ? 'btn-outline-danger' : 'btn-outline-success', title=paciente.activo === 'activo' ? 'Desactivar paciente' : 'Activar paciente')
+                        i(class=paciente.activo === 'activo' ? 'fas fa-toggle-off' : 'fas fa-toggle-on')
+                    
+
+
+    script(src='/js/auth.js')
+    script.
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.btn-ver').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            window.location.href = `/pacientes/${id}`;
+          });
+        });
+
+        document.querySelectorAll('.btn-editar').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            window.location.href = `/pacientes/edit/${id}`;
+          });
+        });
+
+        document.querySelectorAll('.btn-prescribir').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            window.location.href = `/prescripciones/new/${id}`;
+          });
+        });
+        
+        document.querySelectorAll('.activar-desactivar-form').forEach(form => {
+          form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const nombre = form.dataset.nombre || 'este paciente';
+            const estadoActual = form.dataset.estado;
+            const esActivo = estadoActual === 'activo';
+
+            const confirmado = await Swal.fire({
+              title: esActivo ? `¿Desactivar paciente?` : `¿Activar paciente?`,
+              text: `Estás a punto de ${esActivo ? 'desactivar' : 'activar'} a ${nombre}.`,
+              icon: 'question',
+              showCancelButton: true,
+              confirmButtonText: 'Sí',
+              cancelButtonText: 'Cancelar'
+            });
+
+            if (confirmado.isConfirmed) {
+              const action = form.getAttribute('action');
+              const res = await realizarSolicitudProtegida(action, { method: 'PUT' });
+              if (res?.success) {
+                Swal.fire('Éxito', res.message || 'Estado actualizado.', 'success')
+                  .then(() => window.location.reload());
+              } else {
+                Swal.fire('Error', res?.error || 'No se pudo cambiar el estado.', 'error');
+              }
+            }
+          });
+        });
+
+        setTimeout(() => {
+          const alert = document.querySelector('.alert');
+          if(alert) alert.remove();
+        }, 4000); 
+
+        const filtroEstado = document.getElementById('filtroEstado');
+        const tablaPacientes = document.getElementById('tablaPacientes');
+        const filas = tablaPacientes.querySelectorAll('tbody tr');
+
+        filtroEstado.addEventListener('change', () => {
+          const valor = filtroEstado.value; // 'todos', 'activos', 'inactivos'
+
+          filas.forEach(fila => {
+            const estado = fila.getAttribute('data-activo'); // 'activo' o 'inactivo'
+
+            if (valor === 'activos' && estado !== 'activo') {
+              fila.style.display = 'none';
+            } else if (valor === 'inactivos' && estado !== 'inactivo') {
+              fila.style.display = 'none';
+            } else {
+              fila.style.display = '';
+            }
+          });
+        });
+      });

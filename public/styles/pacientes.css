@@ -4,9 +4,53 @@ body {
 }
 
 h1 {
-    font-size: 24px;
+    font-size: 26px;
+    color: #333;
     margin-bottom: 20px;
     text-align: center;
+}
+
+nav {
+    background: linear-gradient(135deg, #007bff, #339af0);
+    padding: 10px;
+    border-radius: 5px;
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+}
+
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: space-around;
+}
+
+nav li {
+    margin: 0 10px;
+}
+
+nav a {
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+
+a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 a {
@@ -38,7 +82,7 @@ form button[type="submit"] {
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-    margin-right: 5px; /* Espacio entre botones */
+    margin-right: 5px; 
 }
 
 form button[type="submit"]:hover {
@@ -54,11 +98,11 @@ table {
 table th, table td {
     border: 1px solid #ddd;
     padding: 8px;
-    text-align: left;
+    vertical-align: middle;
 }
 
 table th {
-    background-color: #f2f2f2;
+    background-color: #e9ecef;
 }
 
 table tr:nth-child(even) {
@@ -67,6 +111,11 @@ table tr:nth-child(even) {
 
 table tr:hover {
     background-color: #f2f2f2;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+    transition: background-color 0.3s ease-in-out;
 }
 
 table td a {
@@ -80,7 +129,11 @@ table td form {
 }
 
 table td form button {
-    margin-bottom: 5px; /* Espacio vertical entre botones en la misma celda */
+    margin-bottom: 5px; 
+}
+
+.btn i{
+    margin-right: 4px;
 }
 
 a {
@@ -99,5 +152,11 @@ a:active {
 }
 
 a:visited {
-    color: #6c757d; 
+    color: #ffffff; 
+}
+
+.aler-info{
+    background-color: #e7f3fe;
+    color: #31708f;
+    border-color: #b3d9ff;
 }

@@ -2,74 +2,44 @@ const pool = require('../config/config');
 
 class Usuario {
     
-    // obtenr todos los usuarios ADMIN
-    static getAllAdmin(callback) {
-        pool.query('SELECT * FROM usuario WHERE id_rol = 2', (error, results) => {
-            if(error) {
-                throw error;
-            }
-            callback(null, results); 
-        })
+    // Obtener todos los usuarios ADMIN
+    static async getAllAdmin() {
+        const [results] = await pool.query('SELECT * FROM usuario WHERE id_rol = 2');
+        return results;
     }
 
-    // obtenr todos los usuarios
-    static getAll() {
-        return new Promise((resolve, reject) => {
-            const query = 'SELECT * FROM usuario';
-            pool.query(query, (err, results) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(results);
-                }
-            });
-        });
+    // Obtener todos los usuarios
+    static async getAll() {
+        const [results] = await pool.query('SELECT * FROM usuario');
+        return results;
     }
 
-    static create(usuario) {
-        return new Promise((resolve, reject) => {
-            const query = `
-            INSERT INTO usuario (email, password, id_rol)
-            VALUES (?, ?, ?)`;
-
-            pool.query(query, [usuario.email, usuario.password, usuario.id_rol], (err, results) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve({ id_usuario: results.insertId, ...usuario });
-                }
-            });
-        });
+    static async create(usuario) {
+        const query = `
+          INSERT INTO usuario (email, password, id_rol, estado)
+          VALUES (?, ?, ?, ?)`;
+        const [results] = await pool.query(query, [usuario.email, usuario.password, usuario.id_rol, 'activo']);
+        return { id_usuario: results.insertId, ...usuario };
     }
 
-    static getById(id) {
-        return new Promise((resolve, reject) => {
-            const query = 'SELECT * FROM usuario WHERE id_usuario = ?';
-            pool.query(query, [id], (err, results) => {
-                if (err) {
-                    reject(err);
-                } else if (results.length) {
-                    const { id_usuario, email, password, id_rol } = results[0];
-                    const usuario = { id_usuario, email, password, id_rol };
-                    resolve(usuario);
-                } else {
-                    reject({ message: 'Usuario no encontrado' });
-                }
-            });
-        });
+    static async getById(id) {
+        const [results] = await pool.query('SELECT * FROM usuario WHERE id_usuario = ?', [id]);
+        if (results.length) {
+            const { id_usuario, email, password, id_rol } = results[0];
+            return { id_usuario, email, password, id_rol };
+        }
+        throw new Error('Usuario no encontrado');
     }
 
-    static getByEmail(email) {
-        return new Promise((resolve, reject) => {
-            const query = 'SELECT * FROM usuario WHERE email = ?';
-            pool.query(query, [email], (err, results) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(results[0]); // Retorna el primer usuario encontrado
-                }
-            });
-        });
+    static async getByEmail(email) {
+        const [results] = await pool.query('SELECT * FROM usuario WHERE email = ?', [email]);
+        return results[0];
+    }
+
+    static async updatePassword(id, hashedPassword){
+        const query = 'UPDATE usuario SET password = ? WHERE id_usuario = ?';
+        const [results] = await pool.query(query, [hashedPassword, id]);
+        return results;
     }
 }
 

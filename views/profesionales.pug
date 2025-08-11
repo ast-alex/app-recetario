@@ -1,0 +1,257 @@
+doctype html
+html
+  head
+    title Profesionales de Salud
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(rel='stylesheet', href='/styles/profesionales.css')
+    link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
+    script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js')
+    script(src='https://code.jquery.com/jquery-3.5.1.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js')
+    script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js')
+    script(src='/js/auth.js')
+
+  body
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-primary
+      a.navbar-brand(href='/home')
+        i.fas.fa-clinic-medical.mr-2
+        | Clínica
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent')
+        span.navbar-toggler-icon
+      .collapse.navbar-collapse#navbarSupportedContent
+        ul.navbar-nav.mr-auto
+          li.nav-item
+            a.nav-link(href='/home')
+              i.fas.fa-home.mr-1
+              | Inicio
+          li.nav-item
+            a.nav-link(href='/pacientes')
+              i.fas.fa-user-injured.mr-1
+              | Pacientes
+          li.nav-item
+            a.nav-link(href='/profesionales/consulta-refeeps')
+              i.fas.fa-user-md.mr-1
+              | Consultar REFEPS
+          li.nav-item
+            a.nav-link(href='/medicamentos')
+              i.fas.fa-pills.mr-1
+              | Medicamentos
+          li.nav-item
+            a.nav-link(href='usuarioAdmin/miperfil')
+              i.fas.fa-user-circle.mr-1
+              | Mi Perfil
+        ul.navbar-nav.ml-auto
+          li.nav-item
+            a.nav-link(href='/auth/logout')
+              i.fas.fa-sign-out-alt.mr-1
+              | Cerrar sesión
+
+    .container.mt-4
+      h1.mb-4.text-center Profesionales de Salud
+        .row.mb-3
+          .col-md-6
+            label(for='filtroEstado') Filtrar por estado:
+            select#filtroEstado.form-control
+              option(value='todos') Todos
+              option(value='activo') Activos
+              option(value='inactivo') Inactivos
+
+          .col-md-6
+            label(for='busquedaDni') Buscar por DNI:
+            input#busquedaDni.form-control(type='text', placeholder='Ingrese DNI')
+
+
+      .text-right
+        a.btn.btn-primary.btn-crear-profesional.mb-3(href='/profesionales/crear')
+          i.fas.fa-user-plus.mr-2
+          | Nuevo Profesional
+
+      table.table.table-striped.table-hover.shadow-sm
+        thead.bg-primary.text-white
+          tr
+            th Nombre
+            th Apellido
+            th DNI
+            th Domicilio
+            th Profesión
+            th Especialidad
+            th Matrícula
+            th ID REFEPS
+            th Caduca
+            th Estado
+            th.text-center Acciones
+        tbody
+          if profesionales.length
+            each p in profesionales
+              tr(data-id=p.id_profesional_salud data-estado=p.estado data-dni=p.dni)
+                td #{p.nombre}
+                td #{p.apellido}
+                td #{p.dni}
+                td #{p.domicilio}
+                td #{p.profesion}
+                td #{p.especialidad}
+                td #{p.matricula}
+                td #{p.id_refeeps}
+                td #{new Date(p.fecha_caducidad).toLocaleDateString('es-AR')}
+                td
+                  span.badge(
+                    class= p.estado === 'activo' ? 'badge-success' : 'badge-secondary'
+                  ) #{p.estado.charAt(0).toUpperCase() + p.estado.slice(1)}
+                td.text-center
+                  button(
+                    class=`btn btn-sm estado-btn btn-outline-${p.estado === 'activo' ? 'danger' : 'success'}`
+                    data-id=p.id_profesional_salud
+                    data-estado=p.estado
+                    title= p.estado === 'activo' ? 'Desactivar profesional' : 'Activar profesional'
+                  )
+                    i.fas.fa-power-off.mr-1
+                    | #{p.estado === 'activo' ? 'Desactivar' : 'Activar'}
+
+                  button.btn.btn-sm.btn-warning.ml-2.btn-editar(
+                    data-id=p.id_profesional_salud 
+                    data-domicilio=p.domicilio 
+                    data-profesion=p.profesion 
+                    data-especialidad=p.especialidad 
+                    title='Editar'
+                  )
+                    i.fas.fa-edit
+
+          else
+            tr
+              td.text-center(colspan='9') No hay profesionales registrados.
+        
+        div#modalEditarProfesional.modal.fade(tabindex='-1', role='dialog')
+          .modal-dialog(role='document')
+            .modal-content
+              .modal-header
+                h5.modal-title Editar Profesional
+                button.close(type='button', data-dismiss='modal')
+                  span &times;
+              .modal-body
+                form#formEditarProfesional
+                  input(type='hidden', id='edit-id-profesional')
+                  .form-group
+                    label(for='edit-domicilio') Domicilio
+                    input.form-control(type='text', id='edit-domicilio')
+                  .form-group
+                    label(for='edit-profesion') Profesión
+                    input.form-control(type='text', id='edit-profesion')
+                  .form-group
+                    label(for='edit-especialidad') Especialidad
+                    input.form-control(type='text', id='edit-especialidad')
+                  .modal-footer
+                    button.btn.btn-secondary(type='button', data-dismiss='modal') Cancelar
+                    button.btn.btn-primary(type='submit') Guardar Cambios
+
+    script(src='/js/auth.js')
+    script.
+      document.addEventListener('DOMContentLoaded', function () {
+        const filtroEstado = document.getElementById('filtroEstado');
+        const busquedaDni = document.getElementById('busquedaDni');
+
+        aplicarFiltros(); 
+
+        filtroEstado.addEventListener('change', aplicarFiltros);
+        busquedaDni.addEventListener('input', aplicarFiltros);
+
+        function aplicarFiltros() {
+          const estadoSeleccionado = filtroEstado.value;
+          const dniBusqueda = busquedaDni.value.trim().toLowerCase();
+
+          const filas = document.querySelectorAll('tbody tr');
+
+          filas.forEach(fila => {
+            const estado = fila.getAttribute('data-estado');
+            const dni = fila.getAttribute('data-dni').toLowerCase();
+
+            const coincideEstado = estadoSeleccionado === 'todos' || estado === estadoSeleccionado;
+            const coincideDni = dni.includes(dniBusqueda);
+
+            fila.style.display = (coincideEstado && coincideDni) ? '' : 'none';
+          });
+        }
+
+        document.querySelectorAll('.estado-btn').forEach(button => {
+          button.addEventListener('click', async function () {
+            const id = this.getAttribute('data-id');
+            const estadoActual = this.getAttribute('data-estado');
+            const nuevoEstado = estadoActual === 'activo' ? 'inactivo' : 'activo';
+
+            try {
+              const res = await realizarSolicitudProtegida(`/profesionales/${id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ estado: nuevoEstado })
+              });
+
+              if (!res || !res.success) {
+                Swal.fire('Error', res?.message || 'No se pudo cambiar el estado', 'error');
+                return;
+              }
+
+              this.innerHTML = `
+                <i class="fas fa-power-off mr-1"></i> ${nuevoEstado === 'activo' ? 'Desactivar' : 'Activar'}
+              `;
+              this.setAttribute('data-estado', nuevoEstado);
+              this.classList.toggle('btn-outline-danger');
+              this.classList.toggle('btn-outline-success');
+
+              const badge = this.closest('tr').querySelector('span.badge');
+              badge.textContent = nuevoEstado.charAt(0).toUpperCase() + nuevoEstado.slice(1);
+              badge.className = nuevoEstado === 'activo' ? 'badge badge-success' : 'badge badge-secondary';
+
+              this.closest('tr').setAttribute('data-estado', nuevoEstado);
+
+              aplicarFiltros(); 
+            } catch (err) {
+              Swal.fire('Error', err.message || 'Fallo en la solicitud', 'error');
+            }
+          });
+        });
+      });
+      
+      document.addEventListener('DOMContentLoaded', function () {
+        const modal = $('#modalEditarProfesional');
+        const form = document.getElementById('formEditarProfesional');
+
+        document.querySelectorAll('.btn-editar').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.getElementById('edit-id-profesional').value = btn.dataset.id;
+            document.getElementById('edit-domicilio').value = btn.dataset.domicilio || '';
+            document.getElementById('edit-profesion').value = btn.dataset.profesion || '';
+            document.getElementById('edit-especialidad').value = btn.dataset.especialidad || '';
+            modal.modal('show');
+          });
+        });
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const id = document.getElementById('edit-id-profesional').value;
+          const domicilio = document.getElementById('edit-domicilio').value.trim();
+          const profesion = document.getElementById('edit-profesion').value.trim();
+          const especialidad = document.getElementById('edit-especialidad').value.trim();
+
+          try {
+            const res = await realizarSolicitudProtegida(`/profesionales/editar-campos/${id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ domicilio, profesion, especialidad })
+            });
+
+            if (!res || !res.success) {
+              Swal.fire('Error', res?.message || 'No se pudo actualizar', 'error');
+              return;
+            }
+
+            Swal.fire('Éxito', 'Profesional actualizado correctamente', 'success')
+              .then(() => location.reload());
+          } catch (err) {
+            Swal.fire('Error', err.message || 'Fallo en la solicitud', 'error');
+          }
+        });
+      });
+

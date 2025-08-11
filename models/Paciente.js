@@ -1,93 +1,67 @@
 const pool = require('../config/config');
-const SweetAlert2 = require('sweetalert2');
 
 class Paciente {
-    constructor(id_paciente, id_plan, nombre, apellido, dni, fecha_nacimiento, sexo) {
-        this.id_paciente = id_paciente;
-        this.id_plan = id_plan;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.dni = dni;
-        this.fecha_nacimiento = fecha_nacimiento;
-        this.sexo = sexo;
-    }
-    
-    static getAll(callback) {
-        pool.query('SELECT * FROM paciente', (error, results) => {
-            if(error) {
-                return callback(error, null);
-            }
-            const pacientes = results.map(row => new Paciente(row.id_paciente, row.id_plan, row.nombre, row.apellido, row.dni, row.fecha_nacimiento, row.sexo));
-            callback(null, pacientes);
-        });
-    }
+  constructor(id_paciente, id_plan, nombre, apellido, dni, fecha_nacimiento, sexo, activo) {
+    this.id_paciente = id_paciente;
+    this.id_plan = id_plan;
+    this.nombre = nombre;
+    this.apellido = apellido;
+    this.dni = dni;
+    this.fecha_nacimiento = fecha_nacimiento;
+    this.sexo = sexo;
+    this.activo = activo;
+  }
 
-    static getById(id, callback) {
-        pool.query('SELECT * FROM paciente WHERE id_paciente = ?', [id], (err, results) => {
-            if (err) {
-                return callback(err, null);
-            }
-            if (results.length) {
-                callback(null, new Paciente(results[0].id_paciente, results[0].id_plan, results[0].nombre, results[0].apellido, results[0].dni, results[0].fecha_nacimiento, results[0].sexo));
-            } else {
-                callback({ message: 'Paciente no encontrado' }, null);
-            }
-        });
-    }
+  static async getAll() {
+    const [results] = await pool.query('SELECT * FROM paciente');
+    return results.map(row => new Paciente(row.id_paciente, row.id_plan, row.nombre, row.apellido, row.dni, row.fecha_nacimiento, row.sexo, row.activo));
+  }
 
-    static create(data, callback){
-        const { id_plan, nombre, apellido, dni, fecha_nacimiento, sexo } = data;
-        pool.query('INSERT INTO paciente (id_plan, nombre, apellido, dni, fecha_nacimiento, sexo) VALUES(?,?,?,?,?,?)', 
-            [id_plan, nombre, apellido, dni, fecha_nacimiento, sexo], 
-            (error, results) => {
-            if(error) {
-                return callback(error);
-            }
-            SweetAlert2.fire({
-                icon: 'success',
-                title: 'Éxito',
-                text: 'Paciente agregado correctamente',
-                confirmButtonText: 'Ok'
-            });
-            callback(null, results);
-            }
-        );
+  static async getById(id) {
+    const [results] = await pool.query('SELECT * FROM paciente WHERE id_paciente = ?', [id]);
+    if (results.length === 0) {
+      throw new Error('Paciente no encontrado');
     }
+    const row = results[0];
+    return new Paciente(row.id_paciente, row.id_plan, row.nombre, row.apellido, row.dni, row.fecha_nacimiento, row.sexo, row.activo);
+  }
 
-    static update(id, data, callback) {
-        const { id_plan, nombre, apellido, dni, fecha_nacimiento, sexo } = data;
-        pool.query('UPDATE paciente SET id_plan = ?, nombre = ?, apellido = ?, dni = ?, fecha_nacimiento = ?, sexo = ? WHERE id_paciente = ?', 
-            [id_plan, nombre, apellido, dni, fecha_nacimiento, sexo, id], 
-            (error, results) => {
-            if(error) {
-                return callback(error);
-            }
-            callback(null, results);
-        });
-    }
+  static async create(data) {
+    const { id_plan, nombre, apellido, dni, fecha_nacimiento, sexo } = data;
+    const activo = true;
+    const [result] = await pool.query(
+      'INSERT INTO paciente (id_plan, nombre, apellido, dni, fecha_nacimiento, sexo, activo) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [id_plan, nombre, apellido, dni, fecha_nacimiento, sexo, activo]
+    );
+    return { id_paciente: result.insertId, ...data, activo };
+  }
 
-    static delete(id, callback) {
-        pool.query('DELETE FROM paciente WHERE id_paciente = ?', [id], (error, results) => {
-            if(error) {
-                return callback(error);
-            }
-            callback(null, results);
-        });
-    }
+  static async update(id, data) {
+    const { id_plan, nombre, apellido, dni, fecha_nacimiento, sexo } = data;
+    await pool.query(
+      'UPDATE paciente SET id_plan = ?, nombre = ?, apellido = ?, dni = ?, fecha_nacimiento = ?, sexo = ? WHERE id_paciente = ?',
+      [id_plan, nombre, apellido, dni, fecha_nacimiento, sexo, id]
+    );
+  }
 
-    static getByDni (dni, callback) {
-        pool.query('SELECT * FROM paciente WHERE dni = ?', [dni], (err, results) => {
-            if (err) {
-                return callback(err, null);
-            }
-            if (results.length) {
-                const pacientes = results.map(row => new Paciente(row.id_paciente, row.id_plan, row.nombre, row.apellido, row.dni, row.fecha_nacimiento, row.sexo));
-                callback(null, pacientes);
-            } else {
-                callback({ message: 'No se econtraron pacientes con ese DNI' }, null);
-            }
-        });
+  static async setActivo(id, estado) {
+  const [result] = await pool.query('UPDATE paciente SET activo = ? WHERE id_paciente = ?', [estado, id]);
+  return result.affectedRows > 0;
+}
+
+
+  static async getByDni(dni) {
+    const [results] = await pool.query('SELECT * FROM paciente WHERE dni = ?', [dni]);
+    if (results.length === 0) {
+      throw new Error('No se encontraron pacientes con ese DNI');
     }
+    return results.map(row => new Paciente(row.id_paciente, row.id_plan, row.nombre, row.apellido, row.dni, row.fecha_nacimiento, row.sexo, row.activo));
+  }
+
+  static async darBaja(id) {
+    const [results] = await pool.query('UPDATE paciente SET activo = FALSE WHERE id_paciente = ?', [id]);
+    return results.affectedRows > 0;
+  }
 }
 
 module.exports = Paciente;

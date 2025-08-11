@@ -1,0 +1,132 @@
+doctype html
+html
+  head
+    title Lista de Medicamentos | Clínica
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(rel='stylesheet', href='/styles/medicamentos.css')
+    link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
+    script(src='https://code.jquery.com/jquery-3.5.1.slim.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js')
+    script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js')
+
+  body
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-primary
+      a.navbar-brand(href='/home')
+        i.fas.fa-clinic-medical.mr-2
+        | Clínica
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+        span.navbar-toggler-icon
+
+      .collapse.navbar-collapse#navbarSupportedContent
+        ul.navbar-nav.mr-auto
+          li.nav-item
+            a.nav-link(href='/home')
+              i.fas.fa-home.mr-1
+              | Inicio
+          li.nav-item
+            a.nav-link(href='/pacientes')
+              i.fas.fa-user-injured.mr-1
+              | Pacientes
+          li.nav-item
+            a.nav-link(href='/profesionales')
+              i.fas.fa-user-md.mr-1
+              | Profesionales
+          li.nav-item
+            a.nav-link(href='/medicamentos')
+              i.fas.fa-pills.mr-1
+              | Medicamentos
+          li.nav-item
+            a.nav-link(href='usuarioAdmin/miperfil')
+              i.fas.fa-user-circle.mr-1
+              | Mi Perfil
+        ul.navbar-nav.ml-auto
+          li.nav-item
+            a.nav-link(href='/auth/logout')
+              i.fas.fa-sign-out-alt.mr-1
+              | Cerrar sesión
+
+    .container.mt-4
+      h1.mb-4 Lista de Medicamentos
+      .div.text-right
+        a.btn.btn-primary.btn-crear-medicamento.mb-3(href='/medicamentos/crear')
+          i.fas.fa-plus.mr-2 
+          | Crear Medicamento
+
+      table.table.table-striped.table-hover.shadow-sm
+        thead.bg-primary.text-white
+          tr
+            th Nombre Genérico
+            th Categoría
+            th Familia
+            th Estado
+            th.text-center Acción/es
+        tbody
+          if medicamentos.length
+            each medicamento in medicamentos
+              tr
+                td #{medicamento.nombre_generico}
+                td #{medicamento.categoria ? medicamento.categoria.nombre : 'Desconocida'}
+                td #{medicamento.familia ? medicamento.familia.nombre : 'Desconocida'}
+                td
+                  span.badge(
+                    class= medicamento.estado === 'activo' ? 'badge-success' : 'badge-secondary'
+                  ) #{medicamento.estado.charAt(0).toUpperCase() + medicamento.estado.slice(1)}
+                td.text-center
+                  button(
+                    class=`btn btn-sm estado-btn btn-outline-${medicamento.estado === 'activo' ? 'danger' : 'success'}`
+                    data-id=medicamento.id_medicamento
+                    data-estado=medicamento.estado
+                    title= medicamento.estado === 'activo' ? 'Desactivar medicamento' : 'Activar medicamento'
+                  )
+                    i.fas.fa-power-off.mr-1
+                    | #{medicamento.estado === 'activo' ? 'Desactivar' : 'Activar'}
+
+                  a.btn.btn-sm.btn-info.ml-2(href=`/medicamentos/detalles/${medicamento.id_medicamento}`, title='Ver detalles')
+                    i.fas.fa-eye
+
+                  a.btn.btn-sm.btn-warning.ml-2(href=`/medicamentos/editar/${medicamento.id_medicamento}`, title='Editar medicamento')
+                    i.fas.fa-edit
+
+          else
+            tr
+              td.text-center(colspan='5') No hay medicamentos registrados.
+
+    script(src="/js/auth.js")
+    script.
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.estado-btn').forEach(button => {
+          button.addEventListener('click', function () {
+            const id = this.getAttribute('data-id');
+            const nuevoEstado = this.getAttribute('data-estado') === 'activo' ? 'inactivo' : 'activo';
+
+            realizarSolicitudProtegida(`/medicamentos/estado/${id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ estado: nuevoEstado })
+            })
+            .then(data => {
+              if (!data) return;
+
+              if (data.success) {
+                this.innerHTML = `
+                  <i class="fas fa-power-off mr-1"></i> ${nuevoEstado === 'activo' ? 'Desactivar' : 'Activar'}
+                `;
+                this.setAttribute('data-estado', nuevoEstado);
+                this.classList.toggle('btn-outline-danger');
+                this.classList.toggle('btn-outline-success');
+                
+                const badge = this.closest('tr').querySelector('span.badge');
+                badge.textContent = nuevoEstado.charAt(0).toUpperCase() + nuevoEstado.slice(1);
+                badge.className = nuevoEstado === 'activo' ? 'badge badge-success' : 'badge badge-secondary';
+              } else {
+                Swal.fire('Error', data.message || 'No se pudo cambiar el estado', 'error');
+              }
+            });
+          });
+        });
+      });

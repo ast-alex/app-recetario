@@ -1,19 +1,46 @@
 doctype html
 html
   head
-    title Login
+    title Login - Clínica Salud
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
     link(rel='stylesheet', href='/styles/styles.css')
+    script(src='https://cdn.jsdelivr.net/npm/sweetalert2@11')
   body
-    h1 Login
-    form(action='/auth/login', method='POST')
-      div
-        label(for='email') Email
-        input(type='email', name='email', id='email', required)
-      div
-        label(for='password') Contraseña
-        input(type='password', name='password', id='password', required)
-      button(type='submit') Iniciar sesión
-    if error
-      p(style="color:red")= error
+    .login-bg
+      .overlay
+        .login-wrapper
+          .login-card.shadow
+            .text-center.mb-4
+              i.fas.fa-hospital.fa-3x.text-primary
+              h2.mt-2 Clínica Salud
+              p.text-muted Ingresá con tu cuenta
+            form(action='/auth/login', method='POST')
+              .form-group
+                label(for='email') Email
+                input.form-control(type='email', name='email', id='email', required, placeholder='ej: doctor@clinica.com')
 
-    script(src="/js/auth.js")
+              .form-group
+                label(for='password') Contraseña
+                input.form-control(type='password', name='password', id='password', required, placeholder='********')
+
+              button.btn.btn-primary.btn-block.mt-3(type='submit')
+                i.fas.fa-sign-in-alt.mr-1
+                | Iniciar sesión
+
+        if error
+          script.
+            Swal.fire({
+              icon: 'error',
+              title: 'Error de autenticación',
+              text: '#{error}'
+            });
+
+        if success
+          script.
+            Swal.fire({
+              icon: 'success',
+              title: '¡Bienvenido!',
+              text: '#{success}'
+            });

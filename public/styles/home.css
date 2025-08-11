@@ -1,0 +1,45 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f7fc;
+  
+}
+
+.home-bg {
+  background-image: url('/images/bg-clinica3.jpg'); 
+  background-size: cover;
+  background-position: center;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 40px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+
+h1 {
+  color: #007bff;
+  margin-bottom: 20px;
+}
+
+p {
+  font-size: 1.1em;
+}
+
+.card {
+  transition: transform 0.2s ease;
+}
+.card:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+.card-body h5 {
+  margin-top: 10px;
+}

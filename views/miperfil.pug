@@ -1,0 +1,132 @@
+doctype html
+html
+  head
+    title Mi Perfil | Clínica
+    link(rel="stylesheet", href="/styles/perfil.css")
+    link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css")
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css")
+    script(src="https://code.jquery.com/jquery-3.5.1.min.js")
+    script(src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js")
+    script(src='https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js')
+
+
+  body
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-primary
+      a.navbar-brand(href='/home') Clínica
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent')
+        span.navbar-toggler-icon
+      .collapse.navbar-collapse#navbarSupportedContent
+        ul.navbar-nav.mr-auto
+          li.nav-item
+            a.nav-link(href='/home')
+              i.fas.fa-home.mr-1
+              | Inicio
+          if usuario.id_rol === 1
+            li.nav-item
+              a.nav-link(href='/pacientes')
+                i.fas.fa-user-injured.mr-1
+                | Pacientes
+            li.nav-item
+             a.nav-link(href='/prescripciones/mis-prescripciones')
+                i.fas.fa-file-medical-alt.mr-1
+                | Prescripciones
+            li.nav-item.active
+             a.nav-link(href='/usuarioAdmin/miperfil')
+                i.fas.fa-user-circle.mr-1
+                | Mi Perfil
+          else if usuario.id_rol === 2
+            li.nav-item
+             a.nav-link(href='/profesionales')
+                i.fas.fa-user-md.mr-1
+                | Profesionales
+            li.nav-item
+             a.nav-link(href='/medicamentos')
+                i.fas.fa-pills.mr-1
+                | Medicamentos
+            li.nav-item
+             a.nav-link(href='/usuarioAdmin/crear-admin')
+                i.fas.fa-user-plus.mr-1
+                | Crear Admin
+            
+        ul.navbar-nav.ml-auto
+          li.nav-item
+            a.nav-link(href='/auth/logout')
+              i.fas.fa-sign-out-alt.mr-1
+              | Cerrar sesión
+
+    .container.d-flex.flex-column.align-items-center.mt-5.mb-5
+      .card.shadow.p-4.text-center(style='width: 100%; max-width: 650px;')
+        img.img-fluid.rounded-circle.mb-3.mx-auto.d-block(
+        style='width: 130px; height: 130px; object-fit: cover; border: 3px solid #007bff;',
+        src='/images/default.jpg',
+        alt='Avatar'
+        )
+        h4.mb-1 #{usuario.id_rol === 2 ? 'Administrador' : 'Profesional de Salud'}
+        small.text-muted.mb-4 #{usuario.email}
+
+        h5.text-left.mb-3.text-primary Datos del Usuario
+        ul.list-unstyled.text-left.mb-4
+          li
+            strong Email: 
+            | #{usuario.email}
+          li
+            strong Rol: 
+            | #{usuario.id_rol === 2 ? 'Administrador' : 'Profesional de Salud'}
+
+        h5.text-left.mb-3.text-primary Cambiar Contraseña
+        form#formCambiarPassword.text-left
+          .form-group
+            label(for='actual') Contraseña actual
+            input.form-control(type='password', id='actual', required=true)
+          .form-group
+            label(for='nueva') Nueva contraseña
+            input.form-control(type='password', id='nueva', required=true)
+          .form-group
+            label(for='confirmar') Repetir nueva contraseña
+            input.form-control(type='password', id='confirmar', required=true)
+          button.btn.btn-primary.btn-block.mt-3(type='submit') Cambiar Contraseña
+
+    script.
+      document.getElementById('formCambiarPassword').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const actual = document.getElementById('actual').value.trim();
+        const nueva = document.getElementById('nueva').value.trim();
+        const confirmar = document.getElementById('confirmar').value.trim();
+
+        if (!actual || !nueva || !confirmar) {
+          Swal.fire('Error', 'Todos los campos son obligatorios', 'error');
+          return;
+        }
+
+        if (nueva !== confirmar) {
+          Swal.fire('Error', 'Las contraseñas nuevas no coinciden', 'error');
+          return;
+        }
+
+        try {
+          const res = await fetch('/usuarioAdmin/cambiar-password', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Solicitud-Fetch': 'true'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ actual, nueva, confirmar })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok || !data.success) {
+            throw new Error(data.message || 'Error al cambiar la contraseña');
+          }
+
+          Swal.fire('Éxito', 'Contraseña actualizada correctamente', 'success')
+            .then(() => {
+              document.getElementById('formCambiarPassword').reset();
+            });
+
+        } catch (err) {
+          Swal.fire('Error', err.message, 'error');
+        }
+      });

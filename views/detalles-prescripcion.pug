@@ -1,0 +1,164 @@
+doctype html
+html
+  head
+    title Detalles de Prescripción
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(rel='stylesheet', href='/styles/detalles-prescripcion.css')
+    link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
+  body
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-primary
+      a.navbar-brand(href='/home')
+        i.fas.fa-clinic-medical.mr-2
+        | Clínica
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNav')
+        span.navbar-toggler-icon
+      .collapse.navbar-collapse#navbarNav
+        ul.navbar-nav.mr-auto
+          li.nav-item
+            a.nav-link(href='/home')
+              i.fas.fa-home.mr-1
+              | Inicio
+          li.nav-item
+            a.nav-link(href='/pacientes')
+              i.fas.fa-user-injured.mr-1
+              | Pacientes
+          li.nav-item
+            a.nav-link(href='/prescripciones')
+              i.fas.fa-prescription.mr-1
+              | Prescripciones
+          li.nav-item
+            a.nav-link(href='usuarioAdmin/miperfil')
+              i.fas.fa-user-circle.mr-1
+              | Mi Perfil
+        ul.navbar-nav.ml-auto
+          li.nav-item
+            a.nav-link(href='/auth/logout')
+              i.fas.fa-sign-out-alt.mr-1
+              | Cerrar sesión
+
+    // Contenido principal
+    .container
+      h1 Detalles de la Prescripción
+
+      .card-prescripcion
+        // Información general
+        .card-section
+          h4 Información General
+          ul.list-group
+            li.list-group-item
+              strong Fecha de Prescripción: 
+              | #{new Date(prescripcion.fecha_prescripcion).toLocaleDateString('es-AR')}
+            li.list-group-item
+              strong Vigencia hasta: 
+              | #{new Date(prescripcion.vigencia).toLocaleDateString('es-AR')}
+            li.list-group-item
+              strong Diagnóstico: 
+              | #{prescripcion.diagnostico || 'No especificado'}
+
+        // Profesional
+        .card-section
+          h4 Profesional de Salud
+          ul.list-group
+            li.list-group-item
+              strong Nombre: 
+              | #{prescripcion.nombre_profesional} #{prescripcion.apellido_profesional}
+            li.list-group-item
+              strong Documento: 
+              | #{prescripcion.documento_profesional}
+            li.list-group-item
+              strong Profesión: 
+              | #{prescripcion.profesion}
+            li.list-group-item
+              strong Especialidad: 
+              | #{prescripcion.especialidad}
+            li.list-group-item
+              strong Domicilio: 
+              | #{prescripcion.domicilio_profesional}
+            li.list-group-item
+              strong Matrícula: 
+              | #{prescripcion.matricula}
+
+        // Paciente
+        .card-section
+          h4 Paciente
+          ul.list-group
+            li.list-group-item
+              strong Nombre: 
+              | #{prescripcion.nombre_paciente} #{prescripcion.apellido_paciente}
+            li.list-group-item
+              strong Documento: 
+              | #{prescripcion.documento_paciente}
+            li.list-group-item
+              strong Fecha de Nacimiento: 
+              | #{new Date(prescripcion.fecha_nacimiento).toLocaleDateString('es-AR')}
+            li.list-group-item
+              strong Sexo: 
+              | #{prescripcion.sexo}
+            li.list-group-item
+              strong Obra Social: 
+              | #{prescripcion.obra_social}
+            li.list-group-item
+              strong Plan: 
+              | #{prescripcion.plan}
+
+        // Medicamentos
+        .card-section
+          h4 Medicamentos Prescritos
+          if prescripcion.medicamentos.length
+            each m in prescripcion.medicamentos
+              .medicamento-item
+                p.mb-1
+                  strong Nombre Genérico: 
+                  | #{m.nombre_generico}
+                p.mb-1
+                  strong Nombre Comercial: 
+                  | #{m.nombre_comercial}
+                p.mb-1
+                  strong Forma Farmacéutica: 
+                  | #{m.forma_farmaceutica}
+                p.mb-1
+                  strong Concentración: 
+                  | #{m.concentracion}
+                p.mb-1
+                  strong Cantidad: 
+                  | #{m.cantidad_unidades} unidades
+                p.mb-1
+                  strong Duración: 
+                  | #{m.duracion} días
+                p.mb-1
+                  strong Intervalo de administración: 
+                  | Cada #{m.intervalo_administracion} horas
+          else
+            p.text-muted No se han prescrito medicamentos.
+
+        // Prestaciones
+        .card-section
+          h4 Prestaciones Solicitadas
+          if prescripcion.prestaciones.length
+            each pr in prescripcion.prestaciones
+              .prestacion-item(class=(pr.resultado || pr.observacion) ? 'completada' : 'pendiente')
+                p.mb-1
+                  strong Nombre: 
+                  | #{pr.nombre_prestacion}
+                p.mb-1
+                  strong Indicación: 
+                  | #{pr.indicacion || 'No especificado'}
+                p.mb-1
+                  strong Justificación: 
+                  | #{pr.justificacion || 'No especificado'}
+                p.mb-1
+                  strong Observación: 
+                  | #{pr.observacion || 'No especificado'}
+                p.mb-1
+                  strong Resultado: 
+                  | #{pr.resultado || 'No especificado'}
+          else
+            p.text-muted No se han solicitado prestaciones.
+
+      // Botón volver
+      .text-center.back-button
+        a.btn.btn-primary.mt-4(href='/prescripciones/mis-prescripciones')
+          i.fas.fa-arrow-left.mr-2
+          | Volver a Mis Prescripciones

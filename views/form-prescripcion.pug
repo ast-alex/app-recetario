@@ -5,139 +5,351 @@ html
     link(rel='stylesheet', href='/styles/styles.css')
     link(rel='stylesheet' href='/styles/form-prescripcion.css')
     link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css")
     script(src='https://code.jquery.com/jquery-3.5.1.slim.min.js')
     script(src='https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js')
     script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js')
     script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js')
+    script(src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js")
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
+    script(src='/js/prescripcionResultados.js') 
   body
-    //- navbar.pug
-    nav.navbar.navbar-expand-lg.navbar-light.bg-light
-      a.navbar-brand(href='/home') Clinica
-      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-primary
+      a.navbar-brand(href='/home')
+        i.fas.fa-clinic-medical.mr-2
+        | Clínica
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNav')
         span.navbar-toggler-icon
-
-      .collapse.navbar-collapse(id='navbarSupportedContent')
+      .collapse.navbar-collapse#navbarNav
         ul.navbar-nav.mr-auto
-          li.nav-item.active
-            a.nav-link(href='/home') Home
           li.nav-item
-            a.nav-link(href='/pacientes') Pacientes
+            a.nav-link(href='/home')
+              i.fas.fa-home.mr-1
+              | Inicio
           li.nav-item
-            a.nav-link(href='/profesionales') Profesionales
+            a.nav-link(href='/pacientes')
+              i.fas.fa-user-injured.mr-1
+              | Pacientes
           li.nav-item
-            a.nav-link(href='/mi-perfil') Mi Perfil
-        ul.navbar-nav.float-right
+            a.nav-link(href='/prescripciones/mis-prescripciones')
+              i.fas.fa-prescription.mr-1
+              | Prescripciones
           li.nav-item
-            a.nav-link(href='/auth/logout') Logout
-          li.nav-item.dropdown
-            a.nav-link.dropdown-toggle(id='navbarDropdownMenuLink', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Accounts
-            .dropdown-menu(aria-labelledby='navbarDropdownMenuLink')
-              a.dropdown-item(href='#') Settings
+            a.nav-link(href='usuarioAdmin/miperfil')
+              i.fas.fa-user-circle.mr-1
+              | Mi Perfil
+        ul.navbar-nav.ml-auto
+          li.nav-item
+            a.nav-link(href='/auth/logout')
+              i.fas.fa-sign-out-alt.mr-1
+              | Cerrar sesión
 
-  
-  
+
     .container
       h1 Prescripción para #{paciente.nombre} #{paciente.apellido}
 
-      form(id='prescripcionForm')
-        input(type='hidden' name='id_paciente' value=paciente.id_paciente)
+      .row
+        .col-md-12#columnaFormulario
+          .d-flex.justify-content-between.align-items-center.mb-3
+            h3 Nueva Prescripción
+            button.btn.btn-outline-primary.btn-sm#btnToggleHistorial(
+              type='button',
+              aria-expanded='false'
+            )
+              i.fas.fa-history.mr-2
+              | Historial del Paciente
 
-        div
-          label(for='profesional') Profesional de Salud:
-          input(type='text' name='profesional' value=`${fullName}` readonly)
-          input(type='hidden' name='id_profesional_salud' value=`${profesional.id_profesional_salud}`)
+          form(id='prescripcionForm')
+            input(type='hidden' name='id_paciente' value=paciente.id_paciente)
 
-        div
-          label(for='diagnostico') Diagnóstico:
-          textarea(name='diagnostico' required)
+            div
+              label(for='profesional') Profesional de Salud:
+              input(type='text' name='profesional' value=`${fullName}` readonly)
+              input(type='hidden' name='id_profesional_salud' value=`${profesional.id_profesional_salud}`)
 
-        div
-          label(for='fecha_prescripcion') Fecha de Prescripción:
-          input(type='date' name='fecha_prescripcion' required)
+            div
+              label(for='diagnostico') Diagnóstico:
+              textarea(name='diagnostico' required)
 
-        div
-          label(for='vigencia') Vigencia:
-          input(type='date' name='vigencia' required)
+            div
+              label(for='vigencia_opcion') Vigencia Receta:
+              select(name='vigencia_opcion' id='vigencia_opcion' required)
+                option(value='30') 30 días
+                option(value='60') 60 días
+                option(value='90') 90 días
+                option(value='custom') Otro (seleccione fecha)
 
-        // Medicamentos
-        h2 Medicamentos
-        div#medicamentos
+            div#customDateContainer(style='display:none; margin-top:10px')
+              label(for='vigencia_custom') Fecha Personalizada:
+              input(type='date' name='vigencia_custom' id='vigencia_custom')
 
-        button(type='button' onclick='addMedicamento()') Añadir Medicamento
+            h2 Medicamentos
+            div#medicamentos
+            button(type='button' onclick='addMedicamento()' class='btn btn-success') Añadir Medicamento
+            p#mensajeLimite(style='color: red; display: none;') Límite de medicamentos alcanzado.
 
-        // Prestaciones
-        h2 Prestaciones
-        div#prestaciones
+            h2 Prestaciones
+            div#prestaciones
+            button(type='button' onclick='addPrestacion()' class='btn btn-success') Añadir Prestación
+            p#mensajeLimit(style='color: red; display: none;') Límite de prestaciones alcanzado.
 
-        button(type='button' onclick='addPrestacion()') Añadir Prestación
+            .buttons-container.mt-3
+              button(type='submit' class='btn btn-primary') Guardar Prescripción
+              button.btn.btn-secondary.ml-2(type='button' onclick="window.location.href='/pacientes'") Volver a la lista de pacientes
 
-        // Botones de guardar y volver
-        .buttons-container
-          button(type='submit') Guardar Prescripción
-          button.btn.btn-secondary(type='button' onclick="window.location.href='/pacientes'") Volver a la lista de pacientes
-        
-        // Aquí se mostrará el enlace de descarga si el PDF ha sido generado
-        div#pdf-link
+            div#pdf-link
 
-    // Pasar datos del servidor al cliente
+        .col-md-6#columnaHistorial(style='display:none')
+          h3.mt-2 Historial de Prescripciones
+          if prescripcionesAnteriores.length > 0
+            #accordionPrescripciones
+              each prescripcion, i in prescripcionesAnteriores
+                .card
+                  .card-header(id='heading' + i)
+                    h2.mb-0
+                      button.btn.btn-link.collapsed(
+                        type='button',
+                        data-toggle='collapse',
+                        data-target='#collapse' + i,
+                        aria-expanded='false',
+                        aria-controls='collapse' + i
+                      )
+                        - const fechaFormateada = new Date(prescripcion.fecha_prescripcion).toLocaleDateString('es-AR')
+                        | Fecha: #{fechaFormateada} - Diagnóstico: #{prescripcion.diagnostico ? prescripcion.diagnostico.substring(0, 30) : ''}
+                  .collapse(id='collapse' + i aria-labelledby='heading' + i data-parent='#accordionPrescripciones')
+                    .card-body
+                      p Diagnóstico: #{prescripcion.diagnostico}
+
+                      if prescripcion.prestaciones && prescripcion.prestaciones.length > 0
+                        each prestacion in prescripcion.prestaciones
+                          .prestacion-anterior.border.p-2.mb-2(style='background-color: #f9f9f9')
+                            h5.mb-1 #{prestacion.nombre}
+
+                            - const tieneResultado = prestacion.resultado && prestacion.resultado.trim() !== ''
+                            - const tieneObservacion = prestacion.observacion && prestacion.observacion.trim() !== ''
+
+                            if tieneResultado || tieneObservacion
+                              p.text-success.mb-1 Resultado registrado
+                              p.small.mb-1
+                                strong Resultado:
+                                | #{prestacion.resultado || '-'}
+                              p.small.mb-2
+                                strong Observación:
+                                | #{prestacion.observacion || '-'}
+                            else
+                              form.form-resultado-observacion(data-id=prestacion.id_prescripcion_prestacion)
+                                .form-group
+                                  label(for='resultado') Resultado:
+                                  textarea.form-control(name='resultado' rows='2')
+                                .form-group
+                                  label(for='observacion') Observación:
+                                  textarea.form-control(name='observacion' rows='2')
+                                button.btn.btn-primary.btn-sm(type='submit') Guardar
+          else
+            p.text-muted No hay prescripciones anteriores para este paciente.
+
+      script.
+        var presentaciones = !{JSON.stringify(presentaciones)};
+        var prestaciones = !{JSON.stringify(prestaciones)};
+        const medicamentosSeleccionados = new Set();
+        const prestacionesSeleccionadas = new Set();
+
+        document.addEventListener('DOMContentLoaded', () => {
+          const btn = document.getElementById('btnToggleHistorial');
+          const historial = document.getElementById('columnaHistorial');
+          const formularioCol = document.getElementById('columnaFormulario');
+
+          if (!btn || !historial || !formularioCol) return;
+
+          btn.addEventListener('click', () => {
+            const visible = historial.style.display !== 'none';
+
+            if (visible) {
+              historial.style.display = 'none';
+              historial.classList.remove('visible');
+              formularioCol.classList.remove('col-md-6');
+              formularioCol.classList.add('col-md-12');
+              btn.innerHTML = `<i class="fas fa-history mr-2"></i> Historial del Paciente`;
+            } else {
+              historial.style.display = 'block';
+              setTimeout(() => {
+                historial.classList.add('visible');
+                formularioCol.classList.remove('col-md-12');
+                formularioCol.classList.add('col-md-6');
+              }, 10);
+              btn.innerHTML = `<i class="fas fa-times mr-2"></i> Ocultar Historial`;
+            }
+          });
+        });
+
     script.
-      var presentaciones = !{JSON.stringify(presentaciones)};
-      var prestaciones = !{JSON.stringify(prestaciones)};
+      function handleSeleccionMedicamento(select) {
 
-    script.
-      function addMedicamento() {
-        var container = document.getElementById('medicamentos');
-        var div = document.createElement('div');
-        div.className = 'medicamento';
-        div.innerHTML = `
-          <select name="medicamentos[id_presentacion][]" required>
-            <option value="">Seleccione una presentación</option>
-            ${presentaciones.map(presentacion => `
-              <option value="${presentacion.id_presentacion}">
-                ${presentacion.nombre_comercial} (${presentacion.nombre_generico}, ${presentacion.concentracion}, ${presentacion.forma_farmaceutica}, ${presentacion.cantidad_unidades})
-              </option>
-            `).join('')}
-          </select>
-          <input type="text" name="medicamentos[duracion][]" placeholder="Duración" required>
-          <input type="text" name="medicamentos[intervalo_administracion][]" placeholder="Intervalo de Administración" required>
-          <button type="button" onclick="removeMedicamento(this)">Eliminar</button>
-        `;
-        container.appendChild(div);
+        const idPresentacion = select.value;
+        const presentacion = presentaciones.find(p => p.id_presentacion == idPresentacion);
+        if (!presentacion) return;
+
+        const idMedicamento = presentacion.id_medicamento;
+
+        if (medicamentosSeleccionados.has(idMedicamento)) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Medicamento duplicado',
+            text: 'Este medicamento ya fue seleccionado. Por favor, elija otro.'
+          });
+          select.value = '';
+          delete select.dataset.medicamentoId;
+          actualizarMedicamentos();
+          return;
+        }
+
+        const anterior = select.dataset.medicamentoId;
+        if (anterior) medicamentosSeleccionados.delete(parseInt(anterior));
+
+        medicamentosSeleccionados.add(idMedicamento);
+        select.dataset.medicamentoId = idMedicamento;
+
+        actualizarMedicamentos();
       }
 
-      function addPrestacion() {
-        var container = document.getElementById('prestaciones');
-        var div = document.createElement('div');
-        div.className = 'prestacion';
+      function getMedicamentosSeleccionadosIds() {
+        return new Set(medicamentosSeleccionados);
+      }
+
+      function ultimoMedicamentoCompleto() {
+        const bloques = document.querySelectorAll('.medicamento');
+        if (bloques.length === 0) return true;
+
+        const ultimo = bloques[bloques.length - 1];
+        const select = ultimo.querySelector('select[name="medicamentos[id_presentacion][]"]');
+        return select && select.value !== '';
+      }
+
+      function quedanMedicamentosDisponibles() {
+        return presentaciones.some(p => !medicamentosSeleccionados.has(p.id_medicamento));
+      }
+
+      function addMedicamento() {
+        const max_medicamentos = 5;
+
+        if(medicamentosSeleccionados.size >= max_medicamentos){
+          Swal.fire({
+            icon: 'warning',
+            title: 'Limite de medicamentos alcanzado.',
+            text: 'Se alcanzó el máximo de medicamentos por receta. Si necesita más, genere una nueva prescripción.',
+            confirmButtonText: 'Aceptar'
+          });
+
+          document.getElementById('mensajeLimite').style.display = 'block';
+          document.querySelector("button[onclick='addMedicamento()']").style.display = 'none';
+          
+          return;
+        }
+
+        if (!quedanMedicamentosDisponibles()) {
+          Swal.fire({
+            icon: 'info',
+            title: 'Sin opciones disponibles',
+            text: 'Ya seleccionaste todos los medicamentos únicos.'
+          });
+          return;
+        }
+        
+
+        if (!ultimoMedicamentoCompleto()) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Completa el medicamento anterior',
+            text: 'Selecciona un medicamento antes de agregar otro.'
+          });
+          return;
+        }
+
+        const container = document.getElementById('medicamentos');
+        const div = document.createElement('div');
+        div.className = 'medicamento';
+
         div.innerHTML = `
-          <select name="prestaciones[id_prestacion][]" required>
-            <option value="">Seleccione una prestación</option>
-            ${prestaciones.map(function(prestacion) {
-              return `
-                <option value="${prestacion.id_prestacion}">
-                  ${prestacion.nombre}
-                </option>
-              `;
-            }).join('')}
+          <select name="medicamentos[id_presentacion][]" class="select-medicamento" required onchange="handleSeleccionMedicamento(this)">
+            <option value="">Seleccione una presentación</option>
           </select>
-          <input type="text" name="prestaciones[lado][]" placeholder="Lado" required>
-          <input type="text" name="prestaciones[indicacion][]" placeholder="Indicación" required>
-          <input type="text" name="prestaciones[justificacion][]" placeholder="Justificación" required>
-          <input type="text" name="prestaciones[observacion][]" placeholder="Observación" required>
-          <input type="text" name="prestaciones[resultado][]" placeholder="Resultado" required>
-          <button type="button" onclick="removePrestacion(this)">Eliminar</button>
+          <input type="text" name="medicamentos[duracion][]" placeholder="*Duración" required>
+          <input type="text" name="medicamentos[intervalo_administracion][]" placeholder="*Intervalo de Administración" required>
+          <button type="button" onclick="removeMedicamento(this)" class="btn btn-danger">Eliminar</button>
         `;
+
         container.appendChild(div);
+        actualizarMedicamentos();
+
+        //select2
+        $(div).find('.select-medicamento').select2({
+          placeholder: 'Buscar medicamento...',
+          width: '100%',
+          templateResult: formatOption,
+          templateSelection: formatSelection
+        });
+      }
+
+      function actualizarMedicamentos() {
+
+        document.querySelectorAll('.medicamento select').forEach(select => {
+          const valorActual = select.value;
+          const presentacionActual = presentaciones.find(p => p.id_presentacion == valorActual);
+          const idActual = presentacionActual ? presentacionActual.id_medicamento : null;
+
+          const usados = new Set(
+            [...medicamentosSeleccionados].filter(id => id !== idActual)
+          );
+
+          select.innerHTML = '<option value="">Seleccione una presentación</option>';
+
+          presentaciones.forEach(p => {
+            const yaSeleccionado = usados.has(p.id_medicamento);
+
+            if (!yaSeleccionado) {
+              const option = document.createElement('option');
+              option.value = p.id_presentacion;
+              option.textContent = `${p.nombre_comercial} (${p.nombre_generico}), ${p.concentracion}, ${p.forma_farmaceutica}, ${p.cantidad_unidades}`;
+              if (p.id_presentacion == valorActual) {
+                option.selected = true;
+              }
+              select.appendChild(option);
+            }
+          });
+          select.dataset.medicamentoId = idActual ?? '';
+        });
+
+        //reiniciar select2
+        document.querySelectorAll('.select-medicamento').forEach(select =>{
+          $(select).select2({
+            placeholder: 'Buscar medicamento...',
+            width: '100%',
+            templateResult: formatOption,
+            templateSelection: formatSelection
+          })
+        })
       }
 
       function removeMedicamento(button) {
-        var div = button.parentNode;
-        div.parentNode.removeChild(div);
-      }
+        
+        const div = button.parentNode;
+        const select = div.querySelector('select[name="medicamentos[id_presentacion][]"]');
+        const idPresentacion = select.value;
 
-      function removePrestacion(button) {
-        var div = button.parentNode;
-        div.parentNode.removeChild(div);
+        const presentacion = presentaciones.find(p => p.id_presentacion == idPresentacion);
+        if (presentacion) {
+          medicamentosSeleccionados.delete(presentacion.id_medicamento);
+        }
+
+        div.remove();
+        actualizarMedicamentos();
+
+        const max_medicamentos = 5;
+
+        if(medicamentosSeleccionados.size < max_medicamentos){
+          document.querySelector("button[onclick='addMedicamento()']").style.display = 'inline-block';
+          document.getElementById('mensajeLimite').style.display = 'none';
+        }
       }
 
       function obtenerMedicamentos() {
@@ -149,7 +361,147 @@ html
             intervalo_administracion: medicamentoDiv.querySelector('input[name="medicamentos[intervalo_administracion][]"]').value
           });
         });
-        return medicamentos;
+        return medicamentos;                              
+      }
+
+      function handleSeleccionPrestacion(select){
+        const idPrestacion = select.value;
+        if(!idPrestacion) return 
+
+        if(prestacionesSeleccionadas.has(idPrestacion)){
+          Swal.fire({
+            icon: 'Error',
+            title: 'Prestacion Duplicada.',
+            text: 'Esta prestacion ya fue seleccionada. Por favor, elija otra.'
+          });
+          select.value = '';
+          delete select.dataset.prestacionId;
+          actualizarPrestaciones();
+          return;
+        }
+
+        const anterior = select.dataset.prestacionId;
+        if(anterior) prestacionesSeleccionadas.delete(parseInt(anterior));
+
+        prestacionesSeleccionadas.add(idPrestacion);
+        select.dataset.prestacionId = idPrestacion;
+
+        actualizarPrestaciones();
+      }
+
+      function ultimaPrestacionCompleta(){
+        const bloques = document.querySelectorAll('.prestacion');
+        if(bloques.length === 0) return true;
+
+        const ultimo = bloques[bloques.length -1];
+        const select = ultimo.querySelector('select[name="prestaciones[id_prestacion][]"]');
+        return select && select.value !== '';
+      }
+
+      function addPrestacion() {
+        const max_prestaciones = 5;
+
+        if(prestacionesSeleccionadas.size >= max_prestaciones){
+          Swal.fire({
+            icon: 'warning',
+            title: 'Limite de prestaciones alcanzado.',
+            text: 'Se alcanzó el máximo de prestaciones por receta. Si necesita más, genere una nueva prescripción.',
+            confirmButtonText: 'Aceptar'
+          });
+
+          document.getElementById('mensajeLimit').style.display = 'block';
+          document.querySelector("button[onclick='addPrestacion()']").style.display = 'none';
+
+          return;
+        }
+
+        if(!ultimaPrestacionCompleta()) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Completa la prestacion anterior',
+            text: 'Selecciona una prestacion antes de agregar otra.'
+          });
+          return;
+        }
+
+        var container = document.getElementById('prestaciones');
+        var div = document.createElement('div');
+        div.className = 'prestacion';
+
+        div.innerHTML = `
+          <select name="prestaciones[id_prestacion][]" class="select-prestacion" required onchange="handleSeleccionPrestacion(this)">
+            <option value="">Seleccione una prestación</option>
+          </select>
+          <input type="text" name="prestaciones[lado][]" placeholder="Lado">
+          <input type="text" name="prestaciones[indicacion][]" placeholder="*Indicación" required>
+          <input type="text" name="prestaciones[justificacion][]" placeholder="*Justificación" required>
+          <input type="text" name="prestaciones[observacion][]" placeholder="Observación">
+          <input type="text" name="prestaciones[resultado][]" placeholder="Resultado">
+          <button type="button" onclick="removePrestacion(this)">Eliminar</button>
+        `;
+
+        container.appendChild(div);
+        actualizarPrestaciones();
+
+        //select2
+        $(div).find('.select-prestacion').select2({
+          placeholder: 'Buscar Prestación...',
+          width: '100%',
+        });
+      }
+
+      function actualizarPrestaciones(){
+        
+        document.querySelectorAll('.prestacion select').forEach(select =>{
+          const valorActual = select.value;
+          const idActual = valorActual ? parseInt(valorActual) : null;
+
+          const usados = new Set(
+            [...prestacionesSeleccionadas].filter(id => id !== idActual)
+          );
+
+          select.innerHTML = '<option value="">Seleccione una prestación</option>';
+
+          prestaciones.forEach(p =>{
+            const yaSeleccionado = usados.has(p.id_prestacion);
+
+            if(!yaSeleccionado){
+              const option = document.createElement('option');
+              option.value = p.id_prestacion;
+              option.textContent = p.nombre;
+              if(p.id_prestacion == valorActual){
+                option.selected = true;
+              }
+              select.appendChild(option);
+            }
+          });
+          select.dataset.prestacionId = idActual ?? '';
+        });
+
+        //reinicio select2
+        document.querySelectorAll('.select-prestacion').forEach(select =>{
+          $(select).select2({
+            placeholder: 'Buscar prestación...',
+            width: '100%',
+          })
+        })
+      }
+
+      function removePrestacion(button) {
+        const div = button.parentNode;
+        const select = div.querySelector('select[name="prestaciones[id_prestacion][]"]');
+        const idPrestacion = select.value;
+
+        prestacionesSeleccionadas.delete(idPrestacion);
+        div.remove();
+        actualizarPrestaciones();
+
+        const max_prestaciones = 5;
+        if(medicamentosSeleccionados.size <max_prestaciones){
+          document.querySelectorAll("button[onclick='addPrestacion()']").style.display  = 'inline-block';
+          document.getElementById('mensajeLimit').style.display = 'none';
+        }
+        
       }
 
       function obtenerPrestaciones() {
@@ -167,14 +519,49 @@ html
         return prestaciones;
       }
 
+      function formatOption(option){
+        if(!option.id) return option.text;
+        const presentacion = presentaciones.find(p => p.id_presentacion == option.id);
+        if(!presentacion) return option.text;
+
+        return $(`
+          <div>
+            <strong>${presentacion.nombre_comercial}</strong>
+            <em>(${presentacion.nombre_generico})</em><br>
+            <small>${presentacion.concentracion}, ${presentacion.forma_farmaceutica}
+          </div>
+        `);
+      }
+
+      function formatSelection(option){
+        const presentacion = presentaciones.find((p => p.id_presentacion == option.id));
+        if(!presentacion) return option.text;
+        return `${presentacion.nombre_comercial} (${presentacion.nombre_generico})`; 
+      }
+
+      document.getElementById('vigencia_opcion').addEventListener('change', function (){
+        const customContainer = document.getElementById('customDateContainer');
+        if(this.value === 'custom'){
+          customContainer.style.display = 'block';
+        }else{
+          customContainer.style.display = 'none';
+        }
+      });
+
       document.getElementById('prescripcionForm').addEventListener('submit', function(event) {
         event.preventDefault();
+
+        let vigenciaSeleccionada;
+
+        const opcionVigencia = document.getElementById('vigencia_opcion').value;
+        const personalizada = document.getElementById('vigencia_custom').value;
+
         const formData = {
           id_paciente: #{paciente.id_paciente},
           id_profesional_salud: document.querySelector('[name="id_profesional_salud"]').value,
           diagnostico: document.querySelector('[name="diagnostico"]').value,
-          fecha_prescripcion: document.querySelector('[name="fecha_prescripcion"]').value,
-          vigencia: document.querySelector('[name="vigencia"]').value,
+          vigencia_opcion: opcionVigencia,
+          vigencia_custom: personalizada,
           medicamentos: obtenerMedicamentos(),
           prestaciones: obtenerPrestaciones()
         };

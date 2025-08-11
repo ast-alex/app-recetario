@@ -1,0 +1,253 @@
+doctype html
+html
+  head
+    title Editar Medicamento
+    link(rel='stylesheet', href='/styles/edit-medicamento.css')
+    link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
+    script(src='https://code.jquery.com/jquery-3.5.1.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js')
+    script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js')
+
+  body
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-primary
+      a.navbar-brand(href='/home')
+        i.fas.fa-clinic-medical.mr-2
+        | Clínica
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+        span.navbar-toggler-icon
+
+      .collapse.navbar-collapse#navbarSupportedContent
+        ul.navbar-nav.mr-auto
+          li.nav-item
+            a.nav-link(href='/home')
+              i.fas.fa-home.mr-1
+              | Inicio
+          li.nav-item
+            a.nav-link(href='/pacientes')
+              i.fas.fa-user-injured.mr-1
+              | Pacientes
+          li.nav-item
+            a.nav-link(href='/profesionales')
+              i.fas.fa-user-md.mr-1
+              | Profesionales
+          li.nav-item
+            a.nav-link(href='/medicamentos')
+              i.fas.fa-pills.mr-1
+              | Medicamentos
+          li.nav-item
+            a.nav-link(href='usuarioAdmin/miperfil')
+              i.fas.fa-user-circle.mr-1
+              | Mi Perfil
+        ul.navbar-nav.ml-auto
+          li.nav-item
+            a.nav-link(href='/auth/logout')
+              i.fas.fa-sign-out-alt.mr-1
+              | Cerrar sesión
+
+    .container.mt-5
+      h1.text-center.mb-4 Editar Medicamento
+      .form-wrapper
+        form#formEditarMedicamento(method="post", action="javascript:void(0)")
+          input(type="hidden", name="id_medicamento", value=id_medicamento)
+
+          .form-group
+            label(for="nombre_generico") Nombre Genérico
+            input.form-control(type="text", name="nombre_generico", value=medicamento.nombre_generico, required)
+
+          .form-group
+            label(for="estado") Estado
+            select.form-control(name="estado")
+              option(value="1", selected=medicamento.estado == 1) Activo
+              option(value="0", selected=medicamento.estado == 0) Inactivo
+
+          .form-group
+            label(for="id_categoria") Categoría
+            select.form-control(name="id_categoria")
+              each c in categorias
+                option(value=c.id_categoria, selected=c.id_categoria == medicamento.id_categoria)= c.nombre
+
+          .form-group
+            label(for="id_familia") Familia
+            select.form-control(name="id_familia")
+              each f in familias
+                option(value=f.id_familia, selected=f.id_familia == medicamento.id_familia)= f.nombre
+
+          h3.mt-4 Presentaciones
+          #presentaciones-container
+            each p in medicamento.presentaciones
+              .presentacion
+                input(type="hidden", name="presentaciones[][id_presentacion]", value=p.id_presentacion)
+                .form-row
+                  .col
+                    label Concentración
+                    select.form-control(name="presentaciones[][id_concentracion]", required)
+                      option(value="", disabled selected) -- Seleccionar --
+                      each c in concentraciones
+                        option(value=c.id_concentracion, selected=c.id_concentracion == p.id_concentracion)= c.valor
+                  .col
+                    label Forma Farmacéutica
+                    select.form-control(name="presentaciones[][id_forma_farmaceutica]", required)
+                      option(value="", disabled selected) -- Seleccionar --
+                      each f in formas
+                        option(value=f.id_forma_farmaceutica, selected=f.id_forma_farmaceutica == p.id_forma_farmaceutica)= f.nombre
+                .form-row.mt-2
+                  .col
+                    label Nombre Comercial
+                    input.form-control(type="text", name="presentaciones[][nombre_comercial]", value=p.nombre_comercial, required)
+                  .col
+                    label Cantidad de Unidades
+                    input.form-control(type="text", name="presentaciones[][cantidad_unidades]", value=p.cantidad_unidades, required)
+                button.btn.btn-danger.mt-2(type="button", onclick=`eliminarPresentacion(this, ${p.id_presentacion})`)
+                  i.fas.fa-trash-alt.mr-1
+                  | Eliminar
+
+
+          button.btn.btn-success.mt-3(type="button", onclick="addPresentacion()")
+            i.fas.fa-plus.mr-1
+            | Añadir Presentación
+
+          input(type="hidden", name="eliminar_presentaciones", id="eliminar_presentaciones" )
+
+          .buttons-container
+            button.btn.btn-primary.mt-3(type="submit", id="btnGuardar") Guardar Cambios
+            a.btn.btn-secondary.mt-3(href="/medicamentos") Cancelar
+
+    script(src="/js/auth.js")
+    script.
+      const concentraciones = !{JSON.stringify(concentraciones)};
+      const formasFarmaceuticas = !{JSON.stringify(formas)};
+      const presentacionesEliminadas = [];
+      let hayCambios = false;
+
+      function cambios() {
+        hayCambios = true;
+        $('#btnGuardar').addClass('btn-warning').removeClass('btn-primary');
+      }
+
+      function handleBeforeUnload(e) {
+        if (hayCambios) {
+          e.preventDefault();
+          e.returnValue = '';
+        }
+      }
+
+      
+        window.addPresentacion = function () {
+          const html = $(`
+            <div class="presentacion" style="display:none;">
+              <div class="form-row">
+                <div class="col">
+                  <label>Concentración</label>
+                  <select class="form-control" name="presentaciones[][id_concentracion]" required>
+                    <option value="" disabled selected>-- Seleccionar --</option>
+                    ${concentraciones.map(c => `<option value="${c.id_concentracion}">${c.valor}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="col">
+                  <label>Forma Farmacéutica</label>
+                  <select class="form-control" name="presentaciones[][id_forma_farmaceutica]" required>
+                    <option value="" disabled selected>-- Seleccionar --</option>
+                    ${formasFarmaceuticas.map(f => `<option value="${f.id_forma_farmaceutica}">${f.nombre}</option>`).join('')}
+                  </select>
+                </div>
+              </div>
+              <div class="form-row mt-2">
+                <div class="col">
+                  <label>Nombre Comercial</label>
+                  <input type="text" class="form-control" name="presentaciones[][nombre_comercial]" required>
+                </div>
+                <div class="col">
+                  <label>Cantidad de Unidades</label>
+                  <input type="text" class="form-control" name="presentaciones[][cantidad_unidades]" required>
+                </div>
+              </div>
+              <button type="button" class="btn btn-danger mt-2" onclick="eliminarPresentacion(this)">
+                <i class="fas fa-trash-alt"></i> Eliminar
+              </button>
+            </div>
+          `);
+
+          $('#presentaciones-container').append(html);
+          html.fadeIn(200);
+          cambios();
+        };
+
+
+
+      // Función para eliminar presentación
+      function eliminarPresentacion(btn, id = null) {
+        Swal.fire({
+          title: '¿Estás seguro?',
+          text: 'Esta presentación será eliminada al guardar cambios.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, eliminar',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            if (id) presentacionesEliminadas.push(id);
+            $('#eliminar_presentaciones').val(JSON.stringify(presentacionesEliminadas));
+            $(btn).closest('.presentacion').remove();
+            cambios();
+          }
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const form = $('#formEditarMedicamento');
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        form.on('change', 'input, select', cambios);
+        $('#presentaciones-container').on('click', '.btn-danger', cambios);
+
+        form.on('submit', function (e) {
+          e.preventDefault();
+
+          const data = {
+            id_medicamento: form.find('input[name="id_medicamento"]').val(),
+            nombre_generico: form.find('input[name="nombre_generico"]').val(),
+            estado: form.find('select[name="estado"]').val(),
+            id_categoria: form.find('select[name="id_categoria"]').val(),
+            id_familia: form.find('select[name="id_familia"]').val(),
+            eliminar_presentaciones: JSON.parse($('#eliminar_presentaciones').val() || '[]'),
+            presentaciones: []
+          };
+
+          let valid = true;
+          $('#presentaciones-container .presentacion').each(function () {
+            const p = $(this);
+            const presentacion = {
+              id_presentacion: p.find('input[name="presentaciones[][id_presentacion]"]').val() || null,
+              id_concentracion: p.find('select[name="presentaciones[][id_concentracion]"]').val(),
+              id_forma_farmaceutica: p.find('select[name="presentaciones[][id_forma_farmaceutica]"]').val(),
+              nombre_comercial: p.find('input[name="presentaciones[][nombre_comercial]"]').val(),
+              cantidad_unidades: p.find('input[name="presentaciones[][cantidad_unidades]"]').val()
+            };
+            if (!presentacion.id_concentracion || !presentacion.id_forma_farmaceutica || !presentacion.nombre_comercial || !presentacion.cantidad_unidades) {
+              Swal.fire('Atención', 'Completa todos los campos en las presentaciones.', 'warning');
+              valid = false;
+              return false; // salir del each
+            }
+            data.presentaciones.push(presentacion);
+          });
+
+          if (!valid) return;
+
+          realizarSolicitudProtegida(`/medicamentos/editar/${data.id_medicamento}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          })
+          .then(res => {
+            if (!res) return;
+            if (res.success) {
+              window.removeEventListener('beforeunload', handleBeforeUnload);
+              Swal.fire('Éxito', res.message, 'success').then(() => window.location.href = '/medicamentos');
+            } else {
+              Swal.fire('Error', res.error, 'error');
+            }
+          });
+        });
+      });

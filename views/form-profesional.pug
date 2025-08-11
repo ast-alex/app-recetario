@@ -2,60 +2,57 @@ doctype html
 html
   head
     title Crear Profesional de Salud
-    link(rel="stylesheet", href="/styles/styles.css") 
+    
     link(rel="stylesheet", href="/styles/form-profesional.css") 
     link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
     script(src='https://code.jquery.com/jquery-3.5.1.slim.min.js')
     script(src='https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js')
     script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js')
-    script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js') 
+    script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js')
+
+    script.
+      window.mensajeError = #{JSON.stringify(mensajeError || null)};
+      window.mensajeExito = #{JSON.stringify(mensajeExito || null)};
+
   body
-    //- navbar.pug
-    nav.navbar.navbar-expand-lg.navbar-light.bg-light
-      a.navbar-brand(href='/home') Clinica
-      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-primary.mb-4
+      a.navbar-brand(href='/home')
+        i.fas.fa-clinic-medical.mr-2
+        | Clínica
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent')
         span.navbar-toggler-icon
 
-      .collapse.navbar-collapse(id='navbarSupportedContent')
+      .collapse.navbar-collapse#navbarSupportedContent
         ul.navbar-nav.mr-auto
+          li.nav-item
+            a.nav-link(href='/home')
+              i.fas.fa-home.mr-1
+              | Home
+          li.nav-item
+            a.nav-link(href='/pacientes')
+              i.fas.fa-user-injured.mr-1
+              | Pacientes
           li.nav-item.active
-            a.nav-link(href='/home') Home
+            a.nav-link(href='/profesionales')
+              i.fas.fa-user-md.mr-1
+              | Profesionales
+          li.nav-item.active
+            a.nav-link(href='/profesionales/consultar-refeeps')
+              i.fas.fa-search.mr-1
+              | Consulta REFEPS
           li.nav-item
-            a.nav-link(href='/pacientes') Pacientes
+            a.nav-link(href='usuarioAdmin/miperfil')
+              i.fas.fa-user-circle.mr-1
+              | Mi Perfil
+        ul.navbar-nav.ml-auto
           li.nav-item
-            a.nav-link(href='/profesionales') Profesionales
-          li.nav-item
-            a.nav-link(href='/mi-perfil') Mi Perfil
-        ul.navbar-nav.float-right
-          li.nav-item
-            a.nav-link(href='/auth/logout') Logout
-          li.nav-item.dropdown
-            a.nav-link.dropdown-toggle(id='navbarDropdownMenuLink', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Accounts
-            .dropdown-menu(aria-labelledby='navbarDropdownMenuLink')
-              a.dropdown-item(href='#') Settings
-    
+            a.nav-link(href='/auth/logout')
+              i.fas.fa-sign-out-alt.mr-1
+              | Logout
+
+
     h1 Crear Profesional de Salud
-
-    // Mostrar alerta si existe error o éxito
-    if mensajeError
-      script.
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: '#{mensajeError}',
-        })
-
-    if mensajeExito
-      script.
-        Swal.fire({
-          icon: 'success',
-          title: 'Éxito',
-          text: '#{mensajeExito}',
-        }).then(()=>{
-            //Elimino el parametro success de la URL desp del alert
-            const newURL = window.location.origin + window.location.pathname;
-            window.history.replaceState({}, document.title, newURL);
-        })
 
     .container
       .left-column
@@ -65,7 +62,7 @@ html
             li #{profesional.nombre} #{profesional.apellido} - #{profesional.profesion} - #{profesional.especialidad}
 
       .right-column
-        form(action="/profesionales/crear" method="POST" id="formProfesional")
+        form#formProfesional(action="/profesionales/crear" method="POST")
           div
             label(for="email") Email
             input(type="email" name="email" id="email" required)
@@ -104,19 +101,105 @@ html
 
           div
             label(for="id_refeeps") ID RefEEPS
-            input(type="text" name="id_refeeps" id="id_refeeps" required)
+            .d-flex.align-items-center
+              input(type="text" name="id_refeeps" id="id_refeeps" required class="form-control mr-2")
+              button.btn.btn-info(type="button" id="verificarRefeeps")
+                i.fas.fa-search.mr-1
+                | Verificar
 
           div
             label(for="fecha_caducidad") Fecha de Caducidad
             input(type="date" name="fecha_caducidad" id="fecha_caducidad" required)
 
-          button(type="submit") Crear Profesional
+          .d-flex.justify-content-between.mt-3
+            button.btn.btn-success(type="submit") 
+              i.fas.fa-user-plus.mr-1
+              | Crear Profesional
 
+            a.btn.btn-outline-secondary(href="/profesionales")
+              i.fas.fa-arrow-left.mr-1
+              | Volver a la lista
+
+    
     script.
-      // Limpiar formulario y actualizar vista al enviarlo exitosamente
-      const form = document.getElementById('formProfesional');
-      form.addEventListener('submit', (event) => {
-        setTimeout(() => {
-          form.reset();
-        }, 100); 
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.mensajeError) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: window.mensajeError
+          });
+        }
+
+        if (window.mensajeExito) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: window.mensajeExito
+          }).then(() => {
+            const newURL = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, newURL);
+          });
+        }
+
+        const form = document.getElementById('formProfesional');
+        form.addEventListener('submit', (e) => {
+          const campos = form.querySelectorAll('input');
+          for (let campo of campos) {
+            if (!campo.value.trim()) {
+              e.preventDefault();
+              Swal.fire({
+                icon: 'warning',
+                title: 'Campos incompletos',
+                text: 'Por favor, completá todos los campos antes de continuar.'
+              });
+              return;
+            }
+          }
+        });
+
+        //btnverificarid
+        const btnVerificar = document.getElementById('verificarRefeeps');
+        btnVerificar.addEventListener('click', async () =>{
+          const id = document.getElementById('id_refeeps').value.trim();
+          if(!id){
+            Swal.fire({
+              icon: 'warning',
+              title: 'Campo vacío',
+              text: 'Ingresá un ID REFEPS para verificar.'
+            });
+            return;
+          }
+
+          try{
+            const response = await fetch(`/profesionales/validar-refeeps/${id}`);
+            const data = await response.json();
+
+            if(response.ok && data.valido){
+              Swal.fire({
+                icon: 'error',
+                title: 'ID ya registrado.',
+                text: data.message
+              });
+            }else if(response.status === 404){
+              Swal.fire({
+                icon: 'success',
+                title: 'ID disponible',
+                text: 'Este ID REFEPS está disponible para su uso.'
+              });
+            }else{
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'Error al verificar el ID.'
+              });
+            }
+          }catch (err){
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Error de red al verificar el ID REFEPS.'
+            });
+          }
+        });
       });

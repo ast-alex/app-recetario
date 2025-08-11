@@ -1,0 +1,209 @@
+doctype html
+html
+  head
+    title Crear Medicamento
+    link(rel='stylesheet', href='/styles/form-medicamentos.css')
+    link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
+    script(src='https://code.jquery.com/jquery-3.5.1.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10')
+    script(src='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js')
+
+  body
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-primary
+      a.navbar-brand(href='/home')
+        i.fas.fa-clinic-medical.mr-2
+        | Clínica
+      button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+        span.navbar-toggler-icon
+
+      .collapse.navbar-collapse#navbarSupportedContent
+        ul.navbar-nav.mr-auto
+          li.nav-item
+            a.nav-link(href='/home')
+              i.fas.fa-home.mr-1
+              | Inicio
+          li.nav-item
+            a.nav-link(href='/pacientes')
+              i.fas.fa-user-injured.mr-1
+              | Pacientes
+          li.nav-item
+            a.nav-link(href='/profesionales')
+              i.fas.fa-user-md.mr-1
+              | Profesionales
+          li.nav-item
+            a.nav-link(href='/medicamentos')
+              i.fas.fa-pills.mr-1
+              | Medicamentos
+          li.nav-item
+            a.nav-link(href='usuarioAdmin/miperfil')
+              i.fas.fa-user-circle.mr-1
+              | Mi Perfil
+        ul.navbar-nav.ml-auto
+          li.nav-item
+            a.nav-link(href='/auth/logout')
+              i.fas.fa-sign-out-alt.mr-1
+              | Cerrar sesión
+
+
+    .container.mt-5
+      .form-wrapper
+        h1 Crear Nuevo Medicamento
+
+        form#medicamentoForm
+          .form-group
+            label(for='nombre_generico') Nombre Genérico:
+            input.form-control(type='text', name='nombre_generico', required)
+
+          .form-group
+            label(for='estado') Estado:
+            select.form-control(name='estado', required)
+              option(value='activo') Activo
+              option(value='inactivo') Inactivo
+
+          .form-group
+            label(for='id_categoria') Categoría:
+            select.form-control(name='id_categoria', required)
+              option(value='') Seleccione una categoría
+              each categoria in categorias
+                option(value=categoria.id_categoria)= categoria.nombre
+
+          .form-group
+            label(for='id_familia') Familia:
+            select.form-control(name='id_familia', required)
+              option(value='') Seleccione una familia
+              each familia in familias
+                option(value=familia.id_familia)= familia.nombre
+
+          h3.mt-4.mb-3 Presentaciones
+          #presentaciones-container
+
+          button.btn.btn-outline-primary.mb-3(type='button', onclick='addPresentacion()')
+            i.fas.fa-plus.mr-1
+            | Añadir Presentación
+
+          .buttons-container
+            button(type='submit') Guardar Medicamento
+            button(type='button', class='btn-secondary', onclick="window.location.href='/medicamentos'") Cancelar
+
+    script.
+      window.concentracionesData = !{concentracionesData};
+      window.formasFarmaceuticasData = !{formasFarmaceuticasData};
+      const concentraciones = window.concentracionesData || [];
+      const formasFarmaceuticas = window.formasFarmaceuticasData || [];
+
+      function addPresentacion() {
+        const container = document.getElementById('presentaciones-container');
+        const div = document.createElement('div');
+        div.className = 'presentacion';
+        div.innerHTML = `
+          <div class="form-row">
+            <div class="col">
+              <label>Concentración:</label>
+              <select class="form-control select2" name="presentaciones[id_concentracion][]" required>
+                <option value="">Seleccione</option>
+                ${concentraciones.map(c => `<option value="${c.id_concentracion}">${c.valor}</option>`).join('')}
+              </select>
+            </div>
+            <div class="col">
+              <label>Forma Farmacéutica:</label>
+              <select class="form-control select2" name="presentaciones[id_forma_farmaceutica][]" required>
+                <option value="">Seleccione</option>
+                ${formasFarmaceuticas.map(f => `<option value="${f.id_forma_farmaceutica}">${f.nombre}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col">
+              <label>Nombre Comercial:</label>
+              <input class="form-control" type="text" name="presentaciones[nombre_comercial][]" required>
+            </div>
+            <div class="col">
+              <label>Cantidad de Unidades:</label>
+              <input class="form-control" type="text" name="presentaciones[cantidad_unidades][]" required>
+            </div>
+          </div>
+          <div class="text-right mt-2">
+            <button class="btn btn-danger btn-sm" type="button" onclick="removePresentacion(this)">
+              <i class="fas fa-trash-alt"></i> Eliminar
+            </button>
+          </div>
+        `;
+        container.appendChild(div);
+        $('.select2').select2(); 
+      }
+
+
+      function removePresentacion(button) {
+        button.closest('.presentacion').remove();
+      }
+
+      document.getElementById('medicamentoForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const presentaciones = document.querySelectorAll('.presentacion');
+        let valid = true;
+
+        presentaciones.forEach(p => {
+          const selects = p.querySelectorAll('select');
+          const inputs = p.querySelectorAll('input');
+          selects.forEach(sel => { if (!sel.value) valid = false; });
+          inputs.forEach(inp => { if (!inp.value.trim()) valid = false; });
+        });
+
+        if (!valid) {
+          Swal.fire({
+            title: 'Campos incompletos',
+            text: 'Debes completar todos los campos de cada presentación.',
+            icon: 'warning',
+            confirmButtonText: 'Entendido'
+          });
+          return;
+        }
+
+        const formData = {
+          nombre_generico: document.querySelector('[name="nombre_generico"]').value,
+          estado: document.querySelector('[name="estado"]').value,
+          id_categoria: document.querySelector('[name="id_categoria"]').value,
+          id_familia: document.querySelector('[name="id_familia"]').value,
+          presentaciones: []
+        };
+
+        presentaciones.forEach(p => {
+          formData.presentaciones.push({
+            id_concentracion: p.querySelector('[name="presentaciones[id_concentracion][]"]').value,
+            id_forma_farmaceutica: p.querySelector('[name="presentaciones[id_forma_farmaceutica][]"]').value,
+            nombre_comercial: p.querySelector('[name="presentaciones[nombre_comercial][]"]').value,
+            cantidad_unidades: p.querySelector('[name="presentaciones[cantidad_unidades][]"]').value
+          });
+        });
+
+        fetch('/medicamentos/crear', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          Swal.fire({
+            title: 'Medicamento Creado',
+            text: data.message,
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            window.location.href = '/medicamentos/';
+          });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo crear el medicamento',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        });
+      });

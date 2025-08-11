@@ -2,87 +2,156 @@ doctype html
 html
     head
         title= title
-        link(rel='stylesheet', href='/styles/styles.css')
         link(rel='stylesheet', href='/styles/form-pacientes.css')
         link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css')
         script(src='https://code.jquery.com/jquery-3.5.1.slim.min.js')
         script(src='https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js')
         script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js')
+        script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js')
+        link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css')
+        if paciente 
+          script.
+            const currentPlanId = '#{paciente.id_plan}';
+        else
+          script.
+            const currentPlanId = null;
     body
-        //- navbar.pug
-        nav.navbar.navbar-expand-lg.navbar-light.bg-light
-            a.navbar-brand(href='/home') Clinica
-            button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
-                span.navbar-toggler-icon
+        nav.navbar.navbar-expand-lg.navbar-dark.bg-primary.mb-4
+          a.navbar-brand(href='/home')
+            i.fas.fa-clinic-medical.mr-2
+            | Clínica
+          button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent')
+            span.navbar-toggler-icon
+          .collapse.navbar-collapse#navbarSupportedContent
+            ul.navbar-nav.mr-auto
+              li.nav-item.active
+                a.nav-link(href='/home')
+                  i.fas.fa-home.mr-1
+                  | Home
+              li.nav-item
+                a.nav-link(href='/pacientes')
+                  i.fas.fa-user-injured.mr-1
+                  | Pacientes
+              li.nav-item
+                a.nav-link(href='/prescripciones/mis-prescripciones')
+                  i.fas.fa-prescription.mr-1
+                  | Prescripciones
+              li.nav-item
+                a.nav-link(href='/mi-perfil')
+                  i.fas.fa-user-circle.mr-1
+                  | Mi Perfil
+            ul.navbar-nav.ml-auto
+              li.nav-item
+                a.nav-link(href='/auth/logout')
+                  i.fas.fa-sign-out-alt.mr-1
+                  | Logout
 
-            .collapse.navbar-collapse(id='navbarSupportedContent')
-                ul.navbar-nav.mr-auto
-                    li.nav-item.active
-                        a.nav-link(href='/home') Home
-                    li.nav-item
-                        a.nav-link(href='/pacientes') Pacientes
-                    li.nav-item
-                        a.nav-link(href='/profesionales') Profesionales
-                    li.nav-item
-                        a.nav-link(href='/mi-perfil') Mi Perfil
-                ul.navbar-nav.float-right
-                    li.nav-item
-                        a.nav-link(href='/auth/logout') Logout
-                    li.nav-item.dropdown
-                        a.nav-link.dropdown-toggle(id='navbarDropdownMenuLink', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Accounts
-                        .dropdown-menu(aria-labelledby='navbarDropdownMenuLink')
-                            a.dropdown-item(href='#') Settings
 
-        .form-paciente
-            h1= title
-            form(id="form-paciente", action=action, method="POST")
+        .container.mt-5
+          .card.shadow
+            .card-header.bg-primary.text-white
+              h2.mb-0= title
+
+            .card-body
+              form#form-paciente(action=action, method="POST")
                 if method === 'PUT'
-                    input(type="hidden", name="_method", value="PUT")
-                label(for="id_plan") Plan: 
-                select(name="id_plan", id="id_plan") 
-                    option(value="" disable selected) Seleccione un Plan
-                br
-                label(for="nombre") Nombre:
-                input(type="text", name="nombre", value=paciente ? paciente.nombre : '')
-                br
-                label(for="apellido") Apellido:
-                input(type="text", name="apellido", value=paciente ? paciente.apellido : '')
-                br
-                label(for="dni") DNI:
-                input(type="text", name="dni", value=paciente ? paciente.dni : '')
-                br
-                label(for="fecha_nacimiento") Fecha de Nacimiento:
-                input(type="date", name="fecha_nacimiento", value=paciente ? paciente.fecha_nacimiento.toISOString().substring(0, 10) : '')
-                br
-                label(for="sexo") Sexo:
-                select(name="sexo")
-                    option(value="M" selected=paciente && paciente.sexo === 'M') Masculino
-                    option(value="F" selected=paciente && paciente.sexo === 'F') Femenino
-                br
-                button(type="submit") Guardar
-            if volverLista 
-                button.btn.btn-secondary(type='button' style='margin-top: 10px;' onclick="window.location.href='/pacientes'") Volver a la lista de pacientes
-        
-script.
-    document.addEventListener('DOMContentLoaded', () => {
-        const selectPlan = document.getElementById('id_plan');
+                  input(type="hidden", name="_method", value="PUT")
 
-        // Cargar planes desde el servidor
-        fetch('/planes')
-            .then(response => response.json())
-            .then(planes => {
-                planes.forEach(plan => {
-                    const option = document.createElement('option');
-                    option.value = plan.id_plan;
-                    option.textContent = `${plan.nombre} (Cobertura: ${plan.cobertura})`;
-                    selectPlan.appendChild(option);
-                });
-                
-                // Seleccionar el plan actual si se edita un paciente
-                const currentPlanId = #{paciente ? paciente.id_plan : 'null'};
-                if (currentPlanId) {
-                    selectPlan.value = currentPlanId;
-                }
-            })
-            .catch(error => console.error('Error al cargar los planes:', error));
-    });
+                .form-group
+                  label(for="id_plan") Plan:
+                  select.form-control(name="id_plan", id="id_plan")
+                    option(value="" disabled selected) Seleccione un Plan
+
+                .form-group
+                  label(for="nombre") Nombre:
+                  input.form-control(type="text", name="nombre", value=paciente ? paciente.nombre : '')
+
+                .form-group
+                  label(for="apellido") Apellido:
+                  input.form-control(type="text", name="apellido", value=paciente ? paciente.apellido : '')
+
+                .form-group
+                  label(for="dni") DNI:
+                  input.form-control(type="text", name="dni", value=paciente ? paciente.dni : '')
+
+                .form-group
+                  label(for="fecha_nacimiento") Fecha de Nacimiento:
+                  input.form-control(type="date", name="fecha_nacimiento", value=paciente ? paciente.fecha_nacimiento.toISOString().substring(0, 10) : '')
+
+                .form-group
+                  label(for="sexo") Sexo:
+                  select.form-control(name="sexo")
+                    option(value="M", selected=paciente && paciente.sexo === 'M') Masculino
+                    option(value="F", selected=paciente && paciente.sexo === 'F') Femenino
+
+                .d-flex.justify-content-between.mt-4
+                  button.btn.btn-success(type="submit")
+                    i.fas.fa-save.mr-1
+                    | Guardar
+
+                  if volverLista
+                    button.btn.btn-outline-secondary(type='button', onclick="window.location.href='/pacientes'")
+                      i.fas.fa-arrow-left.mr-1
+                      | Volver a la lista
+
+        
+    script(src="/js/auth.js")
+    script.
+      document.addEventListener('DOMContentLoaded', () => {
+        const selectPlan = document.getElementById('id_plan');
+        const form = document.getElementById('form-paciente');
+
+        realizarSolicitudProtegida('/planes')
+          .then(planes => {
+            if (!planes) return;
+            planes.forEach(plan => {
+              const option = document.createElement('option');
+              option.value = plan.id_plan;
+              option.textContent = `${plan.nombre} (Cobertura: ${plan.cobertura})`;
+              selectPlan.appendChild(option);
+            });
+            if (currentPlanId) {
+              selectPlan.value = currentPlanId;
+            }
+          })
+          .catch(error => {
+            console.error('Error al cargar los planes:', error);
+            Swal.fire('Error', 'No se pudieron cargar los planes.', 'error');
+          });
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const method = '#{method}';
+          const isEdit = method === 'PUT';
+          const pacienteId = '#{paciente ? paciente.id_paciente : ''}';
+          const url = isEdit ? `/pacientes/${pacienteId}` : '/pacientes';
+
+          const data = {
+            id_plan: form.id_plan.value,
+            nombre: form.nombre.value,
+            apellido: form.apellido.value,
+            dni: form.dni.value,
+            fecha_nacimiento: form.fecha_nacimiento.value,
+            sexo: form.sexo.value
+          };
+
+          const opciones = {
+            method: isEdit ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          };
+
+          const res = await realizarSolicitudProtegida(url, opciones);
+
+          if (!res) return;
+
+          if (res.success) {
+            Swal.fire('Éxito', res.message || 'Paciente guardado correctamente.', 'success')
+              .then(() => window.location.href = '/pacientes');
+          } else {
+            Swal.fire('Error', res.error || 'Ocurrió un error al guardar el paciente.', 'error');
+          }
+        });
+      });
+

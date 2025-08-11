@@ -25,7 +25,6 @@ h2 {
     margin-top: 20px;
 }
 
-/* Estilos para el formulario */
 form {
     margin-top: 20px;
 }
@@ -51,7 +50,7 @@ form select {
 
 form button[type="submit"],
 form button[type="button"] {
-    background-color: #4CAF50;
+    /* background-color: #4CAF50; */
     color: white;
     padding: 10px 20px;
     border: none;
@@ -61,10 +60,31 @@ form button[type="button"] {
     display: inline-block;
     font-size: 16px;
 }
-
-form button[type="button"] {
-    background-color: #45a049;
+.col-md-6.historial-scroll {
+    max-height: 80vh;
+    overflow-y: auto;
+    padding-right: 10px;
 }
+
+#columnaHistorial {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  padding-right: 0; 
+}
+
+#columnaHistorial.visible {
+  max-height: 80vh; 
+  overflow-y: scroll; 
+  padding-right: 10px; 
+  transition: max-height 0.4s ease;
+}
+
+.prestacion-anterior {
+  border-left: 4px solid #007bff;
+  background-color: #fdfdfd;
+}
+
 
 form button[type="button"].btn-secondary {
     background-color: #2880cd;
@@ -78,13 +98,15 @@ button:hover {
     background-color: #45a049;
 }
 
-/* Estilos para la lista de medicamentos y prestaciones */
 .medicamento,
 .prestacion {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 4px;
+    border: 1px solid #ddd;
+    padding: 16px;
+    margin-top: 16px;
+    border-radius: 8px;
+    background-color: #fafafa;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s ease-in-out;
 }
 
 .medicamento button,
@@ -104,7 +126,17 @@ button:hover {
 
 .medicamento button:hover,
 .prestacion button:hover {
-    background-color: #cc0000;
+    background-color: #f0f0f0;
+}
+
+.medicamento select, .medicamento input, .prestacion select, .prestacion input{
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
 a {
@@ -129,7 +161,7 @@ a:visited {
 .buttons-container {
     display: flex;
     justify-content: center;
-    gap: 10px; /* Espacio entre los botones */
-    flex-wrap: wrap; /* Para que los botones puedan moverse a la siguiente línea si no caben en una */
+    gap: 10px; 
+    flex-wrap: wrap; 
     margin-top: 20px;
 }
